@@ -1,0 +1,505 @@
+{% extends "base.html" %}
+{% block title %}Edit Mechanic Profile - MechLink{% endblock %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  body {
+    font-family: "Inter", sans-serif;
+    background: linear-gradient(135deg, #fff5f5 0%, #fee2e2 50%, #fff 100%);
+    min-height: 100vh;
+  }
+
+  .profile-container {
+    max-width: 1100px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem;
+  }
+
+  .brand-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .brand-logo {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+  }
+
+  .brand-tagline {
+    color: #64748b;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .profile-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(220, 38, 38, 0.1);
+    overflow: hidden;
+    border: 1px solid rgba(220, 38, 38, 0.08);
+  }
+
+  .profile-header {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    padding: 3rem 2rem;
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 8s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-10px, -10px) scale(1.05); }
+  }
+
+  .profile-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .profile-subtitle {
+    font-size: 1.05rem;
+    opacity: 0.95;
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+  }
+
+  .profile-body {
+    padding: 3rem 2.5rem;
+  }
+
+  .section-divider {
+    display: flex;
+    align-items: center;
+    margin: 2.5rem 0 2rem 0;
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 1.1rem;
+  }
+
+  .section-divider::before {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #fecaca, #dc2626);
+    margin-right: 1rem;
+  }
+
+  .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(to left, transparent, #fecaca, #dc2626);
+    margin-left: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.75rem;
+  }
+
+  .form-label {
+    display: block;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.625rem;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .label-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    border-radius: 6px;
+    color: white;
+    font-size: 0.75rem;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 2px solid #f1f5f9;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: #fafafa;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: #dc2626;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
+  }
+
+  .form-input:hover {
+    border-color: #fecaca;
+  }
+
+  #map {
+    height: 450px;
+    border-radius: 16px;
+    margin-top: 1rem;
+    border: 3px solid #fee2e2;
+    box-shadow: 0 4px 20px rgba(220, 38, 38, 0.1);
+  }
+
+  .map-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    margin-top: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    background: #fef2f2;
+    border-radius: 10px;
+    border-left: 4px solid #dc2626;
+    font-size: 0.9rem;
+  }
+
+  .coordinates-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .coordinate-item {
+    background: #fafafa;
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 2px solid #f1f5f9;
+    transition: all 0.3s ease;
+  }
+
+  .coordinate-item:hover {
+    border-color: #fecaca;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);
+  }
+
+  .coordinate-item label {
+    display: block;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .coordinate-item input {
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem;
+    background: white;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #dc2626;
+    font-weight: 600;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    background: #fafafa;
+    border-radius: 12px;
+    border: 2px solid #f1f5f9;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    padding: 0.875rem 1rem;
+    background: white;
+    border-radius: 10px;
+    border: 2px solid #f1f5f9;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+  }
+
+  .checkbox-label:hover {
+    border-color: #fecaca;
+    transform: translateX(4px);
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.75rem;
+    cursor: pointer;
+    accent-color: #dc2626;
+  }
+
+  .checkbox-label input[type="checkbox"]:checked + span {
+    color: #dc2626;
+    font-weight: 600;
+  }
+
+  .btn {
+    padding: 1.125rem 3rem;
+    border-radius: 12px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.05rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    color: white;
+    box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(220, 38, 38, 0.4);
+  }
+
+  .btn-primary:active {
+    transform: translateY(-1px);
+  }
+
+  .submit-wrapper {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid #fee2e2;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .coordinates-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .profile-title {
+      font-size: 1.75rem;
+    }
+
+    .profile-body {
+      padding: 2rem 1.5rem;
+    }
+
+    .checkbox-group {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<!-- <div class="profile-container">
+  <div class="brand-header">
+    <div class="brand-logo">🔧 MechLink</div>
+    <div class="brand-tagline">Connecting Mechanics & Customers Seamlessly</div>
+  </div> -->
+
+  <div class="profile-card">
+    <div class="profile-header">
+      <h2 class="profile-title">🧰 Mechanic Profile</h2>
+      <p class="profile-subtitle">Update your workshop information and map location</p>
+    </div>
+
+    <div class="profile-body">
+      <form method="POST" id="profileForm">
+        {% csrf_token %}
+
+        <div class="section-divider">📋 Basic Information</div>
+
+        <!-- Shop Info -->
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-icon">🏪</span>
+            Shop Name
+          </label>
+          <input type="text" name="shop_name" value="{{ profile.shop_name|default:'' }}" class="form-input" placeholder="Enter your workshop name" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-icon">📱</span>
+            Phone Number
+          </label>
+          <input type="text" name="phone" value="{{ profile.phone|default:'' }}" class="form-input" placeholder="+91 00000 00000" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-icon">📍</span>
+            Shop Address
+          </label>
+          <input type="text" name="address" value="{{ profile.address|default:'' }}" class="form-input" placeholder="E.g., Near Apollo Hospital, MG Road, Kochi" required>
+        </div>
+
+        <div class="section-divider">🔧 Services Offered</div>
+
+        <!-- Mechanic Types -->
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-icon">⚙️</span>
+            Select Your Mechanic Specializations
+          </label>
+          <div class="checkbox-group">
+            {% for value, label in mechanic_type_choices %}
+            <label class="checkbox-label">
+              <input type="checkbox" name="mechanic_types" value="{{ value }}" {% if value in profile.mechanic_types %}checked{% endif %}>
+              <span>{{ label }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="section-divider">🗺️ Location Details</div>
+
+        <!-- Map -->
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-icon">📌</span>
+            Workshop Location on Map
+          </label>
+          <div id="map"></div>
+          <div class="map-hint">
+            💡 Click on the map or use the search box to pinpoint your exact workshop location. Your pincode will be auto-filled.
+          </div>
+
+          <div class="coordinates-grid">
+            <div class="coordinate-item">
+              <label>Latitude</label>
+              <input type="text" id="latitude" name="latitude" value="{{ profile.latitude|default:'' }}" readonly>
+            </div>
+            <div class="coordinate-item">
+              <label>Longitude</label>
+              <input type="text" id="longitude" name="longitude" value="{{ profile.longitude|default:'' }}" readonly>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden Fields -->
+        <input type="hidden" id="location" name="location" value="{{ profile.location|default:'' }}">
+        <input type="hidden" id="pincode" name="pincode" value="{{ profile.pincode|default:'' }}">
+
+        <div class="submit-wrapper">
+          <button type="submit" class="btn btn-primary">
+            💾 Save Profile Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 🗺️ Leaflet + Geocoder -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+<script>
+  const defaultLat = {{ profile.latitude|default:9.9312 }};
+  const defaultLng = {{ profile.longitude|default:76.2673 }};
+
+  const map = L.map('map').setView([defaultLat, defaultLng], 13);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+  
+  // Custom red marker icon
+  const redIcon = L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+  
+  let marker = L.marker([defaultLat, defaultLng], { draggable: true, icon: redIcon }).addTo(map);
+
+  function updateInputs(lat, lng) {
+    document.getElementById("latitude").value = lat.toFixed(6);
+    document.getElementById("longitude").value = lng.toFixed(6);
+    updateAddress(lat, lng);
+  }
+
+  // Reverse Geocode to get address + pincode
+  async function updateAddress(lat, lng) {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
+      const data = await res.json();
+      if (data) {
+        document.getElementById("location").value = data.display_name || "";
+        if (data.address && data.address.postcode) {
+          document.getElementById("pincode").value = data.address.postcode;
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch address:", err);
+    }
+  }
+
+  marker.on("dragend", function () {
+    const pos = marker.getLatLng();
+    updateInputs(pos.lat, pos.lng);
+  });
+
+  map.on("click", function (e) {
+    const { lat, lng } = e.latlng;
+    marker.setLatLng([lat, lng]);
+    updateInputs(lat, lng);
+  });
+
+  map.locate({ setView: true, maxZoom: 14 });
+  map.on("locationfound", function (e) {
+    marker.setLatLng(e.latlng);
+    updateInputs(e.latlng.lat, e.latlng.lng);
+  });
+
+  L.Control.geocoder({ defaultMarkGeocode: false })
+    .on('markgeocode', function(e) {
+      const latlng = e.geocode.center;
+      map.setView(latlng, 15);
+      marker.setLatLng(latlng);
+      updateInputs(latlng.lat, latlng.lng);
+      marker.bindPopup(`📍 ${e.geocode.name}`).openPopup();
+    })
+    .addTo(map);
+</script>
+
+{% endblock %}

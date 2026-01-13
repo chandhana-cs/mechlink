@@ -1,0 +1,639 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | MechLink - Your On-Demand Auto Service Solution</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow-x: hidden; background: #0a0b0c; }
+        
+        /* Hero Section */
+        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        
+        .parallax-bg {
+            position: absolute; inset: 0;
+            background-image: url('https://mobileautomechanictech.com/wp-content/uploads/2022/06/6242685d6e3ab-1024x675.jpg');
+            background-position: center; background-size: cover;
+            animation: slowZoom 28s ease-in-out infinite;
+        }
+        @keyframes slowZoom { 0%, 100% { transform: scale(1.08); } 50% { transform: scale(1.14); } }
+        
+        .hero-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(10,11,12,0.75) 0%, rgba(13,14,18,0.92) 100%);
+        }
+        
+        .hero-radial {
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 30% 20%, rgba(239,68,68,0.15), transparent 50%),
+                        radial-gradient(ellipse at 80% 80%, rgba(59,130,246,0.08), transparent 50%);
+        }
+        
+        .hero-content { position: relative; z-index: 10; text-align: center; padding: 2rem; max-width: 1200px; }
+        
+        .brand-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.5rem 1rem; border-radius: 999px;
+            background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+            color: #fca5a5; font-weight: 700; font-size: 0.75rem; letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .main-title {
+            font-size: clamp(3.5rem, 8vw, 7rem);
+            font-weight: 900; line-height: 0.95; margin: 1rem 0;
+            background: linear-gradient(135deg, #fff 0%, #fca5a5 50%, #fff 100%);
+            -webkit-background-clip: text; background-clip: text;
+            color: transparent; letter-spacing: -2px;
+            text-shadow: 0 0 80px rgba(239,68,68,0.3);
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1.25rem, 3vw, 2rem);
+            color: rgba(255,255,255,0.95); font-weight: 700;
+            margin: 1rem 0; letter-spacing: 0.5px;
+        }
+        
+        .hero-desc {
+            color: rgba(255,255,255,0.8); font-size: clamp(1rem, 2vw, 1.15rem);
+            max-width: 700px; margin: 1.5rem auto; line-height: 1.6;
+        }
+        
+        .cta-buttons {
+            display: flex; gap: 1rem; justify-content: center;
+            flex-wrap: wrap; margin-top: 2.5rem;
+        }
+        
+        .btn {
+            padding: 1rem 2rem; border-radius: 999px;
+            font-weight: 800; font-size: 1rem; letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            text-decoration: none; border: none; cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white; box-shadow: 0 20px 40px rgba(239,68,68,0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(239,68,68,0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.95); color: #dc2626;
+            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
+        }
+        .btn-secondary:hover {
+            transform: translateY(-4px); background: white;
+            box-shadow: 0 15px 40px rgba(255,255,255,0.2);
+        }
+        
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem; margin-top: 4rem; max-width: 1000px; margin-left: auto; margin-right: auto;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.05); padding: 1.5rem;
+            border-radius: 1rem; backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.08);
+            text-align: center; transition: all 0.3s;
+        }
+        .stat-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-4px);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem; font-weight: 900;
+            background: linear-gradient(135deg, #ef4444, #fca5a5);
+            -webkit-background-clip: text; background-clip: text;
+            color: transparent;
+        }
+        
+        .stat-label { color: rgba(255,255,255,0.7); margin-top: 0.5rem; font-weight: 600; }
+        
+        /* Services Section */
+        .services-section {
+            background: linear-gradient(180deg, #0a0b0c 0%, #1a1b1e 100%);
+            padding: 5rem 2rem;
+        }
+        
+        .section-header {
+            text-align: center; margin-bottom: 4rem;
+        }
+        
+        .section-badge {
+            display: inline-block; padding: 0.5rem 1rem;
+            background: rgba(239,68,68,0.1); color: #fca5a5;
+            border-radius: 999px; font-weight: 700; font-size: 0.875rem;
+            letter-spacing: 1px; margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 900; color: white; margin-bottom: 1rem;
+        }
+        
+        .section-desc {
+            color: rgba(255,255,255,0.7); font-size: 1.125rem;
+            max-width: 700px; margin: 0 auto;
+        }
+        
+        .services-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem; max-width: 1200px; margin: 0 auto;
+        }
+        
+        .service-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 1.5rem; padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative; overflow: hidden;
+        }
+        
+        .service-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(239,68,68,0.1), transparent);
+            opacity: 0; transition: opacity 0.4s;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(239,68,68,0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .service-card:hover::before { opacity: 1; }
+        
+        .service-icon {
+            width: 70px; height: 70px; border-radius: 1rem;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1.5rem; position: relative;
+        }
+        
+        .service-title {
+            font-size: 1.5rem; font-weight: 800; color: white;
+            margin-bottom: 0.75rem;
+        }
+        
+        .service-desc {
+            color: rgba(255,255,255,0.7); line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .service-tag {
+            display: inline-block; padding: 0.4rem 0.8rem;
+            background: rgba(239,68,68,0.15); color: #fca5a5;
+            border-radius: 999px; font-size: 0.75rem;
+            font-weight: 700; letter-spacing: 0.5px;
+        }
+        
+        /* Products Showcase */
+        .products-section {
+            background: #0a0b0c; padding: 5rem 2rem;
+        }
+        
+        .products-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem; max-width: 1400px; margin: 3rem auto 0;
+        }
+        
+        .product-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 1.25rem; overflow: hidden;
+            transition: all 0.3s; cursor: pointer;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-color: rgba(239,68,68,0.4);
+        }
+        
+        .product-image {
+            width: 100%; height: 200px;
+            background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(59,130,246,0.1));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; position: relative; overflow: hidden;
+        }
+        
+        .product-image::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        .product-card:hover .product-image::before { transform: translateX(100%); }
+        
+        .product-info { padding: 1.5rem; }
+        
+        .product-category {
+            color: #fca5a5; font-size: 0.75rem;
+            font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+        }
+        
+        .product-name {
+            color: white; font-size: 1.25rem;
+            font-weight: 800; margin: 0.5rem 0;
+        }
+        
+        .product-price {
+            color: #10b981; font-size: 1.5rem;
+            font-weight: 900; margin-top: 0.75rem;
+        }
+        
+        /* How It Works */
+        .how-it-works {
+            background: linear-gradient(180deg, #1a1b1e 0%, #0a0b0c 100%);
+            padding: 5rem 2rem;
+        }
+        
+        .steps-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem; max-width: 1200px; margin: 3rem auto 0;
+        }
+        
+        .step-card {
+            text-align: center; position: relative;
+        }
+        
+        .step-number {
+            width: 80px; height: 80px; margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 2rem; font-weight: 900;
+            color: white; box-shadow: 0 10px 30px rgba(239,68,68,0.3);
+        }
+        
+        .step-title {
+            color: white; font-size: 1.5rem; font-weight: 800;
+            margin-bottom: 0.75rem;
+        }
+        
+        .step-desc {
+            color: rgba(255,255,255,0.7); line-height: 1.6;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            padding: 5rem 2rem; text-align: center;
+        }
+        
+        .cta-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 900; color: white; margin-bottom: 1rem;
+        }
+        
+        .cta-desc {
+            color: rgba(255,255,255,0.9); font-size: 1.25rem;
+            max-width: 700px; margin: 0 auto 2rem;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .reveal {
+            opacity: 0; transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal.visible {
+            opacity: 1; transform: translateY(0);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+            .services-grid, .products-grid, .steps-grid { grid-template-columns: 1fr; }
+            .cta-buttons { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="parallax-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-radial"></div>
+        
+        <div class="hero-content">
+            <div class="brand-badge reveal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l2.5 5 5.5.8-4 3.9.9 5.3-4.9-2.6-4.9 2.6.9-5.3-4-3.9 5.5-.8z"/>
+                </svg>
+                TRUSTED BY 10,000+ DRIVERS
+            </div>
+            
+            <h1 class="main-title reveal">MECHLINK</h1>
+            
+            <p class="hero-subtitle reveal">
+                Your On-Demand <span style="color: #fca5a5;">Auto Service</span> Solution
+            </p>
+            
+            <p class="hero-desc reveal">
+                Professional mechanics at your doorstep within minutes • Emergency roadside assistance 24/7 • Genuine auto parts & accessories delivered fast
+            </p>
+            
+            <div class="cta-buttons reveal">
+                <a href="{% url 'login' %}" class="btn btn-primary">
+                    <span>Explore Services</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M13 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <a href="{% url 'shop' %}" class="btn btn-secondary">
+                    <span>Shop Products</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.4 5M17 13l1.4 5M9 21a1 1 0 100-2 1 1 0 000 2zM17 21a1 1 0 100-2 1 1 0 000 2z"/>
+                    </svg>
+                </a>
+            </div>
+            
+            <div class="stats-grid reveal">
+                <div class="stat-card">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Happy Customers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Expert Mechanics</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support Available</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">15min</div>
+                    <div class="stat-label">Avg Response Time</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Services Section -->
+    <section class="services-section" id="services">
+        <div class="section-header reveal">
+            <span class="section-badge">OUR SERVICES</span>
+            <h2 class="section-title">On-Demand Auto Services</h2>
+            <p class="section-desc">Request expert mechanics to your location within minutes. We bring professional automotive care directly to you.</p>
+        </div>
+        
+        <div class="services-grid">
+            <div class="service-card reveal">
+                <div class="service-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <h3 class="service-title">Emergency Repairs</h3>
+                <p class="service-desc">Fast on-site emergency repairs for breakdowns, flat tires, battery issues, and more.</p>
+                <span class="service-tag">IMMEDIATE</span>
+            </div>
+            
+            <div class="service-card reveal">
+                <div class="service-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                    </svg>
+                </div>
+                <h3 class="service-title">Regular Maintenance</h3>
+                <p class="service-desc">Scheduled oil changes, filter replacements, and comprehensive vehicle inspections.</p>
+                <span class="service-tag">PREVENTIVE</span>
+            </div>
+            
+            <div class="service-card reveal">
+                <div class="service-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h3 class="service-title">Diagnostic Services</h3>
+                <p class="service-desc">Advanced computer diagnostics and engine check-ups to identify any issues.</p>
+                <span class="service-tag">ACCURATE</span>
+            </div>
+            
+            <div class="service-card reveal">
+                <div class="service-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                    </svg>
+                </div>
+                <h3 class="service-title">Battery Service</h3>
+                <p class="service-desc">Battery testing, jump-starts, and replacement with genuine parts.</p>
+                <span class="service-tag">FAST</span>
+            </div>
+            
+            <div class="service-card reveal">
+                <div class="service-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"/>
+                    </svg>
+                </div>
+                <h3 class="service-title">Brake Service</h3>
+                <p class="service-desc">Complete brake inspection, pad replacement, and rotor servicing.</p>
+                <span class="service-tag">SAFETY</span>
+            </div>
+            
+            <div class="service-card reveal">
+                <div class="service-icon" style="background: linear-gradient(135deg, #ec4899, #db2777);">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="10" r="3"/>
+                    </svg>
+                </div>
+                <h3 class="service-title">Real-Time Tracking</h3>
+                <p class="service-desc">Track your mechanic's location live and get accurate ETA updates.</p>
+                <span class="service-tag">LIVE</span>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Products Section -->
+    <section class="products-section" id="shop">
+        <div class="section-header reveal">
+            <span class="section-badge">AUTO SHOP</span>
+            <h2 class="section-title">Premium Auto Parts & Accessories</h2>
+            <p class="section-desc">Shop genuine OEM and aftermarket parts with warranty. Fast delivery to your doorstep.</p>
+        </div>
+        
+        <div class="products-grid">
+            <div class="product-card reveal">
+                <div class="product-image">🔋</div>
+                <div class="product-info">
+                    <div class="product-category">POWER</div>
+                    <div class="product-name">Car Batteries</div>
+                    <div class="product-price">From ₹3,999</div>
+                </div>
+            </div>
+            
+            <div class="product-card reveal">
+                <div class="product-image">💡</div>
+                <div class="product-info">
+                    <div class="product-category">LIGHTING</div>
+                    <div class="product-name">LED Headlights</div>
+                    <div class="product-price">From ₹1,499</div>
+                </div>
+            </div>
+            
+            <div class="product-card reveal">
+                <div class="product-image">🛢️</div>
+                <div class="product-info">
+                    <div class="product-category">FLUIDS</div>
+                    <div class="product-name">Engine Oil</div>
+                    <div class="product-price">From ₹899</div>
+                </div>
+            </div>
+            
+            <div class="product-card reveal">
+                <div class="product-image">🔧</div>
+                <div class="product-info">
+                    <div class="product-category">MAINTENANCE</div>
+                    <div class="product-name">Air Filters</div>
+                    <div class="product-price">From ₹399</div>
+                </div>
+            </div>
+            
+            <div class="product-card reveal">
+                <div class="product-image">🛞</div>
+                <div class="product-info">
+                    <div class="product-category">TIRES</div>
+                    <div class="product-name">Premium Tires</div>
+                    <div class="product-price">From ₹5,999</div>
+                </div>
+            </div>
+            
+            <div class="product-card reveal">
+                <div class="product-image">⚙️</div>
+                <div class="product-info">
+                    <div class="product-category">PARTS</div>
+                    <div class="product-name">Brake Pads</div>
+                    <div class="product-price">From ₹1,299</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How It Works -->
+    <section class="how-it-works">
+        <div class="section-header reveal">
+            <span class="section-badge">HOW IT WORKS</span>
+            <h2 class="section-title">Get Help in 3 Simple Steps</h2>
+            <p class="section-desc">Experience hassle-free auto service at your location</p>
+        </div>
+        
+        <div class="steps-grid">
+            <div class="step-card reveal">
+                <div class="step-number">1</div>
+                <h3 class="step-title">Request Service</h3>
+                <p class="step-desc">Select your service type and share your location. Our system finds the nearest qualified mechanic.</p>
+            </div>
+            
+            <div class="step-card reveal">
+                <div class="step-number">2</div>
+                <h3 class="step-title">Track in Real-Time</h3>
+                <p class="step-desc">Watch your mechanic's live location and get accurate arrival time updates on your screen.</p>
+            </div>
+            
+            <div class="step-card reveal">
+                <div class="step-number">3</div>
+                <h3 class="step-title">Get It Fixed</h3>
+                <p class="step-desc">Expert service at your location with transparent pricing and genuine parts. Pay securely online.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Final CTA -->
+    <section class="cta-section">
+        <div class="reveal">
+            <h2 class="cta-title">Ready to Get Started?</h2>
+            <p class="cta-desc">Join thousands of satisfied customers who trust MechLink for their automotive needs</p>
+            <div class="cta-buttons">
+                <a href="/login" class="btn btn-secondary">
+                    <span>Login Now</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+                    </svg>
+                </a>
+                <a href="/register" class="btn" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white;">
+                    <span>Create Account</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M8.5 11a4 4 0 100-8 4 4 0 000 8zM20 8v6M23 11h-6"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Scroll reveal animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+        
+        // Parallax effect on scroll
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const scrolled = window.pageYOffset;
+                    const parallax = document.querySelector('.parallax-bg');
+                    if (parallax) {
+                        parallax.style.transform = `translateY(${scrolled * 0.5}px) scale(1.08)`;
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+        
+        // Add hover effect to cards
+        const cards = document.querySelectorAll('.service-card, .product-card, .stat-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

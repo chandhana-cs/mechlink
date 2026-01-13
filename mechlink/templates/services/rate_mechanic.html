@@ -1,0 +1,639 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --gold: #fbbf24;
+    --text-dark: #0f172a;
+    --text-muted: #64748b;
+    --bg-light: #f8fafc;
+    --card-bg: #ffffff;
+    --border-color: #e2e8f0;
+  }
+
+  body {
+    background: var(--bg-light);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes starPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3) rotate(10deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .rating-container {
+    max-width: 650px;
+    margin: 2rem auto;
+    padding: 1rem;
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  /* Hero Card */
+  .rating-hero {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+    border-radius: 24px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    color: white;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .rating-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.2) 0%, transparent 70%);
+    animation: pulse 6s ease-in-out infinite;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff 0%, #fbbf24 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 500;
+  }
+
+  .mechanic-name {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 800;
+    margin-top: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  /* Rating Form Card */
+  .rating-card {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 3rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+  }
+
+  .rating-card:hover {
+    box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+  }
+
+  /* Star Rating Section */
+  .star-rating-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .section-label {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .star-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .star {
+    font-size: 4rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #e2e8f0;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    user-select: none;
+  }
+
+  .star:hover {
+    transform: scale(1.2) rotate(-10deg);
+  }
+
+  .star.active {
+    color: var(--gold);
+    animation: starPop 0.4s ease;
+    filter: drop-shadow(0 4px 12px rgba(251, 191, 36, 0.5));
+  }
+
+  .star.hovered {
+    color: var(--gold);
+    transform: scale(1.15);
+  }
+
+  .rating-display {
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  .rating-value {
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--gold) 0%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+  }
+
+  .rating-label {
+    display: block;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .rating-description {
+    text-align: center;
+    margin-top: 1rem;
+    padding: 1rem 2rem;
+    background: var(--bg-light);
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .rating-description.excellent { 
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+    color: #047857;
+  }
+
+  .rating-description.good { 
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.05));
+    color: #1e40af;
+  }
+
+  .rating-description.average { 
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+    color: #b45309;
+  }
+
+  .rating-description.poor { 
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));
+    color: #b91c1c;
+  }
+
+  /* Hidden Input */
+  input[name="rating"] {
+    display: none;
+  }
+
+  /* Feedback Section */
+  .feedback-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .feedback-textarea {
+    width: 100%;
+    padding: 1.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-dark);
+    resize: vertical;
+    min-height: 160px;
+    transition: all 0.3s ease;
+    background: var(--bg-light);
+  }
+
+  .feedback-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    background: white;
+  }
+
+  .feedback-textarea::placeholder {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .char-counter {
+    text-align: right;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  /* Quick Feedback Tags */
+  .quick-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .quick-tag {
+    padding: 0.6rem 1.25rem;
+    border-radius: 50px;
+    background: var(--bg-light);
+    border: 2px solid var(--border-color);
+    color: var(--text-dark);
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+  }
+
+  .quick-tag:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  .quick-tag.selected {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+
+  /* Submit Button */
+  .submit-btn {
+    width: 100%;
+    padding: 1.25rem 2rem;
+    border-radius: 16px;
+    font-weight: 900;
+    font-size: 1.1rem;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .submit-btn:hover::before {
+    left: 100%;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.5);
+  }
+
+  .submit-btn:active {
+    transform: translateY(-2px);
+  }
+
+  .submit-btn:disabled {
+    background: #e2e8f0;
+    color: var(--text-muted);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .submit-btn:disabled:hover {
+    transform: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .rating-container {
+      padding: 0.5rem;
+    }
+
+    .rating-card {
+      padding: 2rem 1.5rem;
+    }
+
+    .hero-title {
+      font-size: 1.75rem;
+    }
+
+    .star {
+      font-size: 3rem;
+    }
+
+    .star-container {
+      gap: 0.5rem;
+    }
+  }
+</style>
+
+<div class="rating-container">
+  <!-- Hero Section -->
+  <div class="rating-hero">
+    <div class="hero-content">
+      <div class="hero-icon">⭐</div>
+      <h1 class="hero-title">Rate Your Experience</h1>
+      <p class="hero-subtitle">Help others by sharing your feedback</p>
+      <div class="mechanic-name">
+        🔧 {{ service_request.mechanic.username }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Rating Form -->
+  <div class="rating-card">
+    <form method="post" id="ratingForm">
+      {% csrf_token %}
+
+      <!-- Star Rating Section -->
+      <div class="star-rating-section">
+        <label class="section-label">
+          <span>✨</span> How was your experience?
+        </label>
+
+        <div class="star-container" id="starContainer">
+          <span class="star" data-rating="1">⭐</span>
+          <span class="star" data-rating="2">⭐</span>
+          <span class="star" data-rating="3">⭐</span>
+          <span class="star" data-rating="4">⭐</span>
+          <span class="star" data-rating="5">⭐</span>
+        </div>
+
+        <div class="rating-display">
+          <span class="rating-value" id="ratingValue">0</span>
+          <span class="rating-label" id="ratingLabel">Select Rating</span>
+        </div>
+
+        <div class="rating-description" id="ratingDescription">
+          Click on stars to rate
+        </div>
+
+        <input type="number" name="rating" id="ratingInput" min="1" max="5" value="{{ existing_rating.rating|default:'' }}" required>
+      </div>
+
+      <!-- Feedback Section -->
+      <div class="feedback-section">
+        <label class="section-label">
+          <span>💬</span> Share Your Feedback
+        </label>
+
+        <div class="quick-tags">
+          <span class="quick-tag" data-tag="Professional service">Professional service</span>
+          <span class="quick-tag" data-tag="On time">On time</span>
+          <span class="quick-tag" data-tag="Fair pricing">Fair pricing</span>
+          <span class="quick-tag" data-tag="Quality work">Quality work</span>
+          <span class="quick-tag" data-tag="Friendly">Friendly</span>
+          <span class="quick-tag" data-tag="Knowledgeable">Knowledgeable</span>
+        </div>
+
+        <textarea 
+          name="feedback" 
+          class="feedback-textarea" 
+          id="feedbackText"
+          rows="5" 
+          placeholder="Tell us about your experience with this mechanic... What did you like? What could be improved?"
+          maxlength="500">{{ existing_rating.feedback|default:'' }}</textarea>
+        
+        <div class="char-counter">
+          <span id="charCount">0</span> / 500 characters
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="submit-btn" id="submitBtn" disabled>
+        <span>🚀</span> Submit Feedback
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Star rating system
+  const stars = document.querySelectorAll('.star');
+  const ratingInput = document.getElementById('ratingInput');
+  const ratingValue = document.getElementById('ratingValue');
+  const ratingLabel = document.getElementById('ratingLabel');
+  const ratingDescription = document.getElementById('ratingDescription');
+  const submitBtn = document.getElementById('submitBtn');
+  
+  let selectedRating = {{ existing_rating.rating|default:0 }};
+
+  const ratingLabels = {
+    1: 'Poor',
+    2: 'Below Average',
+    3: 'Average',
+    4: 'Good',
+    5: 'Excellent'
+  };
+
+  const ratingDescriptions = {
+    1: '😞 Not satisfied with the service',
+    2: '😐 Service needs improvement',
+    3: '🙂 Service was okay',
+    4: '😊 Great service!',
+    5: '🤩 Outstanding service!'
+  };
+
+  const ratingClasses = {
+    1: 'poor',
+    2: 'poor',
+    3: 'average',
+    4: 'good',
+    5: 'excellent'
+  };
+
+  // Initialize if existing rating
+  if (selectedRating > 0) {
+    updateStars(selectedRating);
+    updateRatingDisplay(selectedRating);
+    checkFormValidity();
+  }
+
+  // Star hover effect
+  stars.forEach(star => {
+    star.addEventListener('mouseenter', function() {
+      const rating = parseInt(this.getAttribute('data-rating'));
+      highlightStars(rating);
+    });
+
+    star.addEventListener('click', function() {
+      selectedRating = parseInt(this.getAttribute('data-rating'));
+      ratingInput.value = selectedRating;
+      updateStars(selectedRating);
+      updateRatingDisplay(selectedRating);
+      checkFormValidity();
+    });
+  });
+
+  // Reset hover effect on mouse leave
+  document.getElementById('starContainer').addEventListener('mouseleave', function() {
+    updateStars(selectedRating);
+  });
+
+  function highlightStars(rating) {
+    stars.forEach((star, index) => {
+      if (index < rating) {
+        star.classList.add('hovered');
+      } else {
+        star.classList.remove('hovered');
+      }
+    });
+  }
+
+  function updateStars(rating) {
+    stars.forEach((star, index) => {
+      star.classList.remove('hovered');
+      if (index < rating) {
+        star.classList.add('active');
+      } else {
+        star.classList.remove('active');
+      }
+    });
+  }
+
+  function updateRatingDisplay(rating) {
+    ratingValue.textContent = rating;
+    ratingLabel.textContent = ratingLabels[rating];
+    ratingDescription.textContent = ratingDescriptions[rating];
+    
+    // Update description class
+    ratingDescription.className = 'rating-description ' + ratingClasses[rating];
+  }
+
+  // Quick tags functionality
+  const quickTags = document.querySelectorAll('.quick-tag');
+  const feedbackText = document.getElementById('feedbackText');
+
+  quickTags.forEach(tag => {
+    tag.addEventListener('click', function() {
+      this.classList.toggle('selected');
+      const tagText = this.getAttribute('data-tag');
+      
+      if (this.classList.contains('selected')) {
+        // Add tag to feedback
+        if (feedbackText.value) {
+          feedbackText.value += ', ' + tagText;
+        } else {
+          feedbackText.value = tagText;
+        }
+      } else {
+        // Remove tag from feedback
+        feedbackText.value = feedbackText.value
+          .replace(', ' + tagText, '')
+          .replace(tagText + ', ', '')
+          .replace(tagText, '');
+      }
+      updateCharCount();
+      checkFormValidity();
+    });
+  });
+
+  // Character counter
+  const charCount = document.getElementById('charCount');
+  
+  feedbackText.addEventListener('input', function() {
+    updateCharCount();
+    checkFormValidity();
+  });
+
+  function updateCharCount() {
+    charCount.textContent = feedbackText.value.length;
+  }
+
+  // Initialize char count
+  updateCharCount();
+
+  // Form validation
+  function checkFormValidity() {
+    if (selectedRating > 0) {
+      submitBtn.disabled = false;
+    } else {
+      submitBtn.disabled = true;
+    }
+  }
+
+  // Form submission animation
+  document.getElementById('ratingForm').addEventListener('submit', function(e) {
+    submitBtn.innerHTML = '<span>⏳</span> Submitting...';
+    submitBtn.disabled = true;
+  });
+
+  // Initialize form
+  checkFormValidity();
+</script>
+
+{% endblock %}

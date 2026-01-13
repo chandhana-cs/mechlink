@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  :root {
+    --mechanic-primary: #ff6b35;
+    --mechanic-secondary: #004e89;
+    --mechanic-dark: #1a1a2e;
+    --mechanic-accent: #ffa500;
+    --success-grad: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    --warning-grad: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --info-grad: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --primary-grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --danger-grad: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+    --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    --hover-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  }
+
+  body {
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    min-height: 100vh;
+    padding-bottom: 3rem;
+  }
+
+  .service-requests-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .requests-hero {
+    background: linear-gradient(135deg, var(--mechanic-dark) 0%, var(--mechanic-secondary) 100%);
+    border-radius: 30px;
+    padding: 4rem 2rem;
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    border: 2px solid rgba(255, 107, 53, 0.3);
+  }
+
+  .requests-hero h2 {
+    font-size: 3rem;
+    font-weight: 900;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .requests-grid {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .request-card {
+    background: white;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: all 0.4s ease;
+    border: 2px solid transparent;
+  }
+
+  .request-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--hover-shadow);
+    border-color: var(--mechanic-primary);
+  }
+
+  .request-header {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .status-badge {
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-pending { background: var(--warning-grad); color: white; }
+  .status-accepted { background: var(--info-grad); color: white; }
+  .status-in-progress { background: var(--primary-grad); color: white; }
+  .status-completed { background: var(--success-grad); color: white; }
+  .status-rejected, .status-expired { background: var(--danger-grad); color: white; }
+
+  .actions-section {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 2rem;
+    border-radius: 20px;
+    border-top: 3px solid var(--mechanic-primary);
+  }
+
+  .action-btn {
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+  }
+
+  .action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-chat { background: var(--primary-grad); color: white; }
+  .btn-submit-rating { background: var(--success-grad); color: white; }
+
+  .rating-display {
+    background: #e6ffed;
+    border-radius: 15px;
+    padding: 1rem;
+    text-align: center;
+    border: 2px solid #16a34a;
+    color: #065f46;
+    font-weight: 600;
+  }
+
+  .empty-state {
+    background: white;
+    border-radius: 25px;
+    padding: 4rem;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+  }
+
+  .empty-state h3 {
+    font-size: 2rem;
+    font-weight: 800;
+  }
+
+</style>
+
+<div class="service-requests-container">
+  <div class="requests-hero">
+    <h2>🧾 My Service Requests</h2>
+    <p>Track and manage all your automotive service requests</p>
+  </div>
+
+  {% if requests %}
+  <div class="requests-grid">
+    {% for req in requests %}
+    <div class="request-card">
+      <div class="request-header">
+        <div class="request-number">🎫 Request #{{ forloop.counter }}</div>
+        <div class="request-date">📅 {{ req.created_at|date:"M d, Y H:i" }}</div>
+
+        <div class="status-badge 
+          {% if req.status == 'pending' %}status-pending
+          {% elif req.status == 'accepted' %}status-accepted
+          {% elif req.status == 'in_progress' %}status-in-progress
+          {% elif req.status == 'completed' %}status-completed
+          {% elif req.status == 'rejected' %}status-rejected
+          {% elif req.status == 'expired' %}status-expired{% endif %}">
+          {% if req.status == 'pending' %}⏳ Pending
+          {% elif req.status == 'accepted' %}✅ Accepted
+          {% elif req.status == 'in_progress' %}🔧 In Progress
+          {% elif req.status == 'completed' %}🎉 Completed
+          {% elif req.status == 'rejected' %}❌ Rejected
+          {% elif req.status == 'expired' %}⏰ Expired{% endif %}
+        </div>
+      </div>
+
+      <div class="request-body" style="padding:1.5rem 2rem;">
+        <div class="info-grid" style="display:grid; gap:1rem; margin-bottom:1rem;">
+          <div><strong>👨‍🔧 Mechanic:</strong>
+            {% if req.mechanic %} {{ req.mechanic.username }}
+            {% else %}<span style="color:gray;">Not Assigned</span>{% endif %}
+          </div>
+          <div><strong>📍 Location:</strong> {{ req.location }}</div>
+        </div>
+
+        <div class="issue-description" style="margin-bottom:1rem;">
+          <strong>📝 Issue:</strong> {{ req.issue_description }}
+        </div>
+
+        <div class="actions-section">
+          {% if req.status == 'accepted' %}
+            <a href="{% url 'chat_view' req.id %}" class="action-btn btn-chat">💬 Start Chat</a>
+
+          {% elif req.status == 'completed' %}
+            {% if req.rating %}
+              <div class="rating-display">
+                ⭐ {{ req.rating }}/5<br>
+                {% if req.feedback %}<em>"{{ req.feedback }}"</em>{% endif %}
+              </div>
+            {% else %}
+              <div class="rating-form">
+                <form method="POST" action="{% url 'rate_mechanic' req.id %}">
+                  {% csrf_token %}
+                  <label>⭐ Rate This Service</label>
+                  <select name="rating" class="form-select mb-3" required>
+                    <option value="">Select Rating</option>
+                    <option value="1">⭐ 1 - Poor</option>
+                    <option value="2">⭐⭐ 2 - Fair</option>
+                    <option value="3">⭐⭐⭐ 3 - Good</option>
+                    <option value="4">⭐⭐⭐⭐ 4 - Very Good</option>
+                    <option value="5">⭐⭐⭐⭐⭐ 5 - Excellent</option>
+                  </select>
+                  <label>💭 Feedback (Optional)</label>
+                  <input type="text" name="feedback" class="form-control mb-3"
+                         placeholder="Tell us about your experience...">
+                  <button type="submit" class="action-btn btn-submit-rating w-100">🚀 Submit</button>
+                </form>
+              </div>
+            {% endif %}
+
+          {% elif req.status == 'expired' or req.status == 'rejected' %}
+            <!-- ✅ Correct re-raise link -->
+            <a href="{% url 'raise_request' %}?re_raise={{ req.id }}" class="action-btn btn-chat">🔁 Re-Raise Request</a>
+
+          {% else %}
+            <div style="text-align:center; color:#6c757d;">⏱️ Waiting for updates...</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon" style="font-size:5rem;">🚗</div>
+    <h3>No Service Requests</h3>
+    <p>You haven’t made any service requests yet. Need automotive help? Create your first request!</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

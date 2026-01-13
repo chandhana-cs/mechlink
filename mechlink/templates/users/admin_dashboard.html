@@ -1,0 +1,781 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load tz %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary: #8b5cf6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --bg-light: #f8fafc;
+    --card-bg: #ffffff;
+    --text-dark: #0f172a;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.15);
+    --shadow-xl: 0 20px 50px rgba(0,0,0,0.2);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: var(--bg-light);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-dark);
+  }
+
+  .admin-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  /* Hero Header */
+  .admin-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 24px;
+    padding: 3rem 2.5rem;
+    margin-bottom: 2.5rem;
+    color: white;
+    box-shadow: var(--shadow-xl);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .admin-hero::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+  }
+
+  .admin-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    left: -50px;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+
+  .hero-timestamp {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .stat-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .stat-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .stat-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+  }
+
+  .stat-card::after {
+    content: '→';
+    position: absolute;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: var(--primary);
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover::after {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    transition: transform 0.3s ease;
+  }
+
+  .stat-card:hover .stat-icon {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  .stat-icon.users { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+  .stat-icon.mechanics { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+  .stat-icon.customers { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+  .stat-icon.products { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+  .stat-icon.orders { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+  .stat-icon.requests { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+
+  .stat-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-top: 0.5rem;
+  }
+
+  /* Section Card */
+  .section-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+
+  .section-header {
+    padding: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(to right, #f8fafc, #ffffff);
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-dark);
+  }
+
+  /* Table Styles */
+  .table-container {
+    padding: 2rem;
+    overflow-x: auto;
+  }
+
+  .modern-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .modern-table thead {
+    background: #f8fafc;
+  }
+
+  .modern-table th {
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    font-weight: 700;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 2px solid var(--border-color);
+  }
+
+  .modern-table td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-dark);
+    font-size: 0.95rem;
+  }
+
+  .modern-table tbody tr {
+    transition: all 0.2s ease;
+  }
+
+  .modern-table tbody tr:hover {
+    background: #f8fafc;
+  }
+
+  /* Status Badges */
+  .status-badge {
+    display: inline-block;
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: capitalize;
+    letter-spacing: 0.02em;
+  }
+
+  .status-badge.delivered,
+  .status-badge.approved {
+    background: rgba(16, 185, 129, 0.15);
+    color: #065f46;
+  }
+
+  .status-badge.pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: #92400e;
+  }
+
+  .status-badge.cancelled,
+  .status-badge.rejected {
+    background: rgba(239, 68, 68, 0.15);
+    color: #991b1b;
+  }
+
+  .status-badge.accepted {
+    background: rgba(59, 130, 246, 0.15);
+    color: #1e40af;
+  }
+
+  /* Role Badge */
+  .role-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+
+  .role-badge.mechanic {
+    background: rgba(139, 92, 246, 0.15);
+    color: #6b21a8;
+  }
+
+  .role-badge.customer {
+    background: rgba(16, 185, 129, 0.15);
+    color: #065f46;
+  }
+
+  .role-badge.admin {
+    background: rgba(239, 68, 68, 0.15);
+    color: #991b1b;
+  }
+
+  /* Action Links */
+  .action-link {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .action-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+  }
+
+  .action-link.danger {
+    color: var(--danger);
+  }
+
+  .action-link.danger:hover {
+    color: #dc2626;
+  }
+
+  .action-link.success {
+    color: var(--success);
+  }
+
+  .action-link.success:hover {
+    color: #059669;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted);
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .empty-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-subtext {
+    font-size: 0.95rem;
+    opacity: 0.8;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .stats-grid {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+  }
+
+  @media (max-width: 768px) {
+    .admin-container {
+      padding: 1rem;
+    }
+
+    .admin-hero {
+      padding: 2rem 1.5rem;
+    }
+
+    .hero-content {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+
+    .hero-title {
+      font-size: 1.75rem;
+    }
+
+    .hero-timestamp {
+      width: 100%;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .section-header {
+      padding: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+    }
+
+    .table-container {
+      padding: 1rem;
+    }
+
+    /* Mobile Table */
+    .modern-table thead {
+      display: none;
+    }
+
+    .modern-table, .modern-table tbody, .modern-table tr, .modern-table td {
+      display: block;
+    }
+
+    .modern-table tr {
+      background: white;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+      padding: 1rem;
+    }
+
+    .modern-table td {
+      padding: 0.75rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: none;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modern-table td:last-child {
+      border-bottom: none;
+    }
+
+    .modern-table td::before {
+      content: attr(data-label);
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-title {
+      font-size: 1.5rem;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+    }
+  }
+</style>
+
+<div class="admin-container">
+  <!-- Hero Header -->
+  <div class="admin-hero">
+    <div class="hero-content">
+      <div>
+        <h1 class="hero-title">
+          <span>🧭</span>
+          Admin Dashboard
+        </h1>
+        <p class="hero-subtitle">Manage your platform with ease</p>
+      </div>
+      <div class="hero-timestamp">
+        <span>🕐</span>
+        <span>{{ now|localtime|date:"M d, Y H:i" }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <a href="#users-section" class="stat-card" onclick="scrollToSection(event, 'users-section')">
+      <div class="stat-header">
+        <div>
+          <div class="stat-label">Total Users</div>
+          <div class="stat-value">{{ stats.total_users }}</div>
+        </div>
+        <div class="stat-icon users">👥</div>
+      </div>
+    </a>
+
+    <a href="#users-section" class="stat-card" onclick="scrollToSection(event, 'users-section')">
+      <div class="stat-header">
+        <div>
+          <div class="stat-label">Mechanics</div>
+          <div class="stat-value">{{ stats.total_mechanics }}</div>
+        </div>
+        <div class="stat-icon mechanics">🔧</div>
+      </div>
+    </a>
+
+    <a href="#users-section" class="stat-card" onclick="scrollToSection(event, 'users-section')">
+      <div class="stat-header">
+        <div>
+          <div class="stat-label">Customers</div>
+          <div class="stat-value">{{ stats.total_customers }}</div>
+        </div>
+        <div class="stat-icon customers">🛒</div>
+      </div>
+    </a>
+
+    <a href="#products-section" class="stat-card" onclick="scrollToSection(event, 'products-section')">
+      <div class="stat-header">
+        <div>
+          <div class="stat-label">Products</div>
+          <div class="stat-value">{{ stats.total_products }}</div>
+        </div>
+        <div class="stat-icon products">🧰</div>
+      </div>
+    </a>
+
+    <a href="#orders-section" class="stat-card" onclick="scrollToSection(event, 'orders-section')">
+      <div class="stat-header">
+        <div>
+          <div class="stat-label">Orders</div>
+          <div class="stat-value">{{ stats.total_orders }}</div>
+        </div>
+        <div class="stat-icon orders">📦</div>
+      </div>
+    </a>
+
+    <a href="#requests-section" class="stat-card" onclick="scrollToSection(event, 'requests-section')">
+      <div class="stat-header">
+        <div>
+          <div class="stat-label">Service Requests</div>
+          <div class="stat-value">{{ stats.total_requests }}</div>
+        </div>
+        <div class="stat-icon requests">🧾</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Users Section -->
+  <div class="section-card" id="users-section">
+    <div class="section-header">
+      <h2 class="section-title">👥 Registered Users</h2>
+    </div>
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th style="text-align: center;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td data-label="Username">{{ u.username }}</td>
+            <td data-label="Role">
+              <span class="role-badge {{ u.role }}">{{ u.role }}</span>
+            </td>
+            <td data-label="Email">{{ u.email }}</td>
+            <td data-label="Phone">{{ u.phone|default:"-" }}</td>
+            <td data-label="Actions" style="text-align: center;">
+              <a href="{% url 'delete_user' u.id %}" 
+                 class="action-link danger"
+                 onclick="return confirm('Are you sure you want to delete {{ u.username }}?')">
+                 🗑️ Delete
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <div class="empty-icon">👥</div>
+                <div class="empty-text">No users found</div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Products Section -->
+  <div class="section-card" id="products-section">
+    <div class="section-header">
+      <h2 class="section-title">🧰 Products</h2>
+    </div>
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Mechanic</th>
+            <th>Price</th>
+            <th>Stock</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in products %}
+          <tr>
+            <td data-label="Product">{{ p.name }}</td>
+            <td data-label="Mechanic">{{ p.mechanic.username }}</td>
+            <td data-label="Price">${{ p.price }}</td>
+            <td data-label="Stock">{{ p.stock }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4">
+              <div class="empty-state">
+                <div class="empty-icon">🧰</div>
+                <div class="empty-text">No products found</div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Orders Section -->
+  <div class="section-card" id="orders-section">
+    <div class="section-header">
+      <h2 class="section-title">📦 Orders</h2>
+    </div>
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Total</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in orders %}
+          <tr>
+            <td data-label="Order ID">#{{ o.id }}</td>
+            <td data-label="Customer">{{ o.customer.username }}</td>
+            <td data-label="Product">{{ o.product.name }}</td>
+            <td data-label="Qty">{{ o.quantity }}</td>
+            <td data-label="Total">${{ o.total_price }}</td>
+            <td data-label="Status">
+              <span class="status-badge {{ o.status|lower }}">{{ o.status }}</span>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <div class="empty-icon">📦</div>
+                <div class="empty-text">No orders found</div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Service Requests -->
+  <div class="section-card" id="requests-section">
+    <div class="section-header">
+      <h2 class="section-title">🧾 Service Requests</h2>
+    </div>
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Issue</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th style="text-align: center;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for req in service_requests %}
+          <tr>
+            <td data-label="Customer">{{ req.user.username }}</td>
+            <td data-label="Issue">{{ req.issue_description }}</td>
+            <td data-label="Location">{{ req.location }}</td>
+            <td data-label="Status">
+              <span class="status-badge {{ req.status|lower }}">{{ req.status }}</span>
+            </td>
+            <td data-label="Action" style="text-align: center;">
+              {% if req.status == 'pending' %}
+                <a href="{% url 'admin_approve_request' req.id %}" class="action-link success">✓ Approve</a>
+                <span style="color: var(--text-muted);"> | </span>
+                <a href="{% url 'admin_reject_request' req.id %}" class="action-link danger">✗ Reject</a>
+              {% else %}
+                <span style="color: var(--text-muted); font-size: 0.85rem;">No action</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <div class="empty-icon">🧾</div>
+                <div class="empty-text">No service requests found</div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+function scrollToSection(event, sectionId) {
+  event.preventDefault();
+  const section = document.getElementById(sectionId);
+  if (section) {
+    section.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    });
+    
+    // Add a subtle highlight effect
+    section.style.transition = 'all 0.3s ease';
+    section.style.transform = 'scale(1.01)';
+    setTimeout(() => {
+      section.style.transform = 'scale(1)';
+    }, 300);
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,659 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    --danger-gradient: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+    --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --dark-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    --card-shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.12);
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+  }
+
+  body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  .order-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem 1rem;
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  /* Breadcrumb Styling */
+  .breadcrumb-wrapper {
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    transition: var(--transition-smooth);
+  }
+
+  .breadcrumb-wrapper:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .breadcrumb {
+    margin: 0;
+    background: transparent;
+    padding: 0;
+  }
+
+  .breadcrumb-item {
+    font-size: 0.95rem;
+  }
+
+  .breadcrumb-item a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition-smooth);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .breadcrumb-item a:hover {
+    color: #764ba2;
+    transform: translateX(3px);
+  }
+
+  .breadcrumb-item.active {
+    color: #6c757d;
+    font-weight: 600;
+  }
+
+  /* Order Header */
+  .order-header-card {
+    background: white;
+    border-radius: 24px;
+    padding: 3rem;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+  }
+
+  .order-header-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--primary-gradient);
+    animation: shimmer 3s infinite linear;
+    background-size: 1000px 100%;
+  }
+
+  .order-header-card::after {
+    content: '📦';
+    position: absolute;
+    bottom: -30px;
+    right: -30px;
+    font-size: 12rem;
+    opacity: 0.04;
+    transform: rotate(-15deg);
+    pointer-events: none;
+  }
+
+  .order-title {
+    font-size: 2.75rem;
+    font-weight: 900;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.5px;
+  }
+
+  .order-date {
+    color: #6c757d;
+    font-size: 1.05rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .order-date i {
+    color: #667eea;
+    font-size: 1.1rem;
+  }
+
+  /* Status Badge */
+  .status-badge {
+    padding: 1.1rem 2.5rem;
+    border-radius: 60px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    border: 3px solid white;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .status-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: left 0.5s ease;
+  }
+
+  .status-badge:hover::before {
+    left: 100%;
+  }
+
+  .status-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  .status-pending { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+  .status-processing { background: var(--info-gradient); color: white; }
+  .status-shipped { background: var(--primary-gradient); color: white; }
+  .status-delivered { background: var(--success-gradient); color: white; }
+  .status-cancelled { background: var(--danger-gradient); color: white; }
+  .status-paid { background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); color: white; }
+  .status-accepted { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #2c3e50; }
+
+  /* Card Styling */
+  .professional-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: var(--transition-smooth);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    height: 100%;
+  }
+
+  .professional-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-8px);
+  }
+
+  .professional-card-header {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 1.75rem 2rem;
+    border: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .professional-card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .professional-card-header h5 {
+    margin: 0;
+    font-weight: 800;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .professional-card-body {
+    padding: 2.5rem;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 0;
+    border-bottom: 2px solid #f8f9fa;
+    transition: var(--transition-smooth);
+  }
+
+  .info-row:last-child {
+    border-bottom: none;
+  }
+
+  .info-row:hover {
+    background: linear-gradient(90deg, rgba(102, 126, 234, 0.05) 0%, transparent 100%);
+    padding-left: 1rem;
+    border-radius: 8px;
+  }
+
+  .info-label {
+    font-weight: 700;
+    color: #495057;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .info-label i {
+    color: #667eea;
+    font-size: 1.2rem;
+  }
+
+  .info-value {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1.1rem;
+    text-align: right;
+  }
+
+  /* Product Section */
+  .product-showcase {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 2.5rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    border: 2px solid #e9ecef;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition-smooth);
+  }
+
+  .product-showcase::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .product-showcase:hover {
+    border-color: #667eea;
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
+  }
+
+  .product-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #2c3e50;
+    margin-bottom: 1.25rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .product-meta {
+    display: inline-flex;
+    align-items: center;
+    background: white;
+    padding: 0.85rem 1.75rem;
+    border-radius: 60px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 1.25rem;
+    font-size: 1.05rem;
+    transition: var(--transition-smooth);
+    position: relative;
+    z-index: 1;
+  }
+
+  .product-meta:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .product-description {
+    color: #6c757d;
+    font-size: 1rem;
+    line-height: 1.7;
+    font-style: italic;
+    position: relative;
+    z-index: 1;
+  }
+
+  .product-price {
+    font-size: 3.5rem;
+    font-weight: 900;
+    background: var(--success-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -1px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 24px;
+    box-shadow: var(--card-shadow);
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+  }
+
+  .action-btn {
+    padding: 1.1rem 2.75rem;
+    border-radius: 60px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    transition: var(--transition-smooth);
+    border: none;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .action-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .action-btn:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  .action-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .action-btn:active {
+    transform: translateY(-2px);
+  }
+
+  .action-btn i {
+    font-size: 1.2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .action-btn span {
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-back { background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; }
+  .btn-print { background: var(--primary-gradient); color: white; }
+  .btn-update { background: var(--success-gradient); color: white; }
+  .btn-danger { background: var(--danger-gradient); color: white; }
+
+  /* Grid Layout Improvements */
+  .details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .order-header-card {
+      padding: 2rem 1.5rem;
+    }
+
+    .order-title {
+      font-size: 2rem;
+    }
+
+    .status-badge {
+      padding: 0.85rem 1.75rem;
+      font-size: 0.95rem;
+    }
+
+    .professional-card-body {
+      padding: 1.5rem;
+    }
+
+    .action-btn {
+      padding: 0.9rem 2rem;
+      font-size: 0.9rem;
+    }
+
+    .product-price {
+      font-size: 2.5rem;
+    }
+
+    .details-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .action-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* Print Styles */
+  @media print {
+    body {
+      background: white;
+    }
+
+    .action-buttons,
+    .breadcrumb-wrapper {
+      display: none !important;
+    }
+
+    .professional-card,
+    .order-header-card {
+      box-shadow: none;
+      border: 1px solid #dee2e6;
+      page-break-inside: avoid;
+    }
+  }
+
+  /* Loading Animation */
+  @keyframes loadingPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  .loading-skeleton {
+    animation: loadingPulse 1.5s ease-in-out infinite;
+  }
+</style>
+
+<div class="order-container">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-wrapper">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'mechanic_dashboard' %}">🏠 Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Order Details</li>
+      </ol>
+    </nav>
+  </div>
+
+  <!-- Order Header -->
+  <div class="order-header-card">
+    <div class="row align-items-center">
+      <div class="col-lg-8 mb-3 mb-lg-0">
+        <h1 class="order-title">Order #{{ order.id }}</h1>
+        <p class="order-date">
+          <i class="bi bi-clock-history"></i>
+          <span>Placed on {{ order.ordered_at|date:"F d, Y \a\t h:i A" }}</span>
+        </p>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <span class="status-badge 
+          {% if order.status == 'Pending' %}status-pending
+          {% elif order.status == 'Processing' %}status-processing
+          {% elif order.status == 'Shipped' %}status-shipped
+          {% elif order.status == 'Delivered' %}status-delivered
+          {% elif order.status == 'Cancelled' %}status-cancelled
+          {% elif order.status == 'Paid' %}status-paid
+          {% elif order.status == 'Accepted' %}status-accepted
+          {% endif %}">
+          ✨ {{ order.status }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Details Grid -->
+  <div class="details-grid">
+    <!-- Product Information -->
+    <div class="professional-card">
+      <div class="professional-card-header">
+        <h5><i class="bi bi-box-seam"></i> Product Details</h5>
+      </div>
+      <div class="professional-card-body">
+        <div class="product-showcase">
+          <h3 class="product-title">{{ order.product.name }}</h3>
+          <div class="product-meta">
+            <i class="bi bi-tag-fill"></i>
+            Quantity: {{ order.quantity }}
+          </div>
+          {% if order.product.description %}
+            <p class="product-description">{{ order.product.description }}</p>
+          {% endif %}
+        </div>
+        <div class="info-row">
+          <span class="info-label"><i class="bi bi-currency-dollar"></i> Unit Price</span>
+          <span class="info-value">${{ order.product.price }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label"><i class="bi bi-calculator"></i> Total Amount</span>
+          <span class="info-value product-price">${{ order.total_amount }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Information -->
+    <div class="professional-card">
+      <div class="professional-card-header">
+        <h5><i class="bi bi-person-circle"></i> Customer Details</h5>
+      </div>
+      <div class="professional-card-body">
+        <div class="info-row">
+          <span class="info-label"><i class="bi bi-person-badge"></i> Name</span>
+          <span class="info-value">{{ order.customer.first_name }} {{ order.customer.last_name }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label"><i class="bi bi-envelope"></i> Email</span>
+          <span class="info-value">{{ order.customer.email }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label"><i class="bi bi-telephone"></i> Phone</span>
+          <span class="info-value">{{ order.customer.phone|default:"Not provided" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label"><i class="bi bi-geo-alt"></i> Address</span>
+          <span class="info-value">{{ order.shipping_address|default:"Not provided" }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <a href="{% url 'mechanic_dashboard' %}" class="action-btn btn-back">
+      <i class="bi bi-arrow-left-circle"></i>
+      <span>Back to Dashboard</span>
+    </a>
+    <button class="action-btn btn-print" onclick="window.print()">
+      <i class="bi bi-printer-fill"></i>
+      <span>Print Order</span>
+    </button>
+
+    {% if order.status == 'Paid' %}
+      <a href="{% url 'update_order_status' order.id 'accept' %}" class="action-btn btn-update">
+        <i class="bi bi-check-circle-fill"></i>
+        <span>Accept Order</span>
+      </a>
+    {% elif order.status == 'Accepted' %}
+      <a href="{% url 'update_order_status' order.id 'processing' %}" class="action-btn btn-update">
+        <i class="bi bi-gear-fill"></i>
+        <span>Start Processing</span>
+      </a>
+    {% elif order.status == 'Processing' %}
+      <a href="{% url 'update_order_status' order.id 'deliver' %}" class="action-btn btn-update">
+        <i class="bi bi-truck"></i>
+        <span>Mark as Delivered</span>
+      </a>
+    {% endif %}
+
+    {% if order.status != 'Delivered' and order.status != 'Cancelled' %}
+      <a href="{% url 'update_order_status' order.id 'cancel' %}" class="action-btn btn-danger" onclick="return confirm('Are you sure you want to cancel this order?');">
+        <i class="bi bi-x-circle-fill"></i>
+        <span>Cancel Order</span>
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

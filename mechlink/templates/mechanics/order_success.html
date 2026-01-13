@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="text-align:center; padding:100px;">
+  <h1>✅ Payment Successful!</h1>
+  <p>Thank you for your order. Your payment has been successfully processed.</p>
+  <a href="{% url 'mechanic_dashboard' %}" class="btn btn-primary">Back to Dashboard</a>
+</div>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Raise a Service Request{% endblock %}
+{% block content %}
+
+<!-- 🗺️ Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- 🔍 Leaflet Geocoder (Search) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+<style>
+  body { background: #f8fafc; font-family: "Inter", sans-serif; }
+  .wrapper { max-width: 1100px; margin: 2rem auto; padding: 1rem; }
+  .card { background: #fff; border-radius: 16px; padding: 2rem; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); }
+  .title { font-size: 2rem; font-weight: 800; color: #f59e0b; text-align: center; }
+  .btn { width: 100%; padding: 1rem; border-radius: 10px; font-weight: 700; color: white; border: none; cursor: pointer; background: linear-gradient(135deg, #22c55e, #16a34a); transition: all 0.2s; }
+  .btn:hover { transform: translateY(-2px); background: linear-gradient(135deg, #16a34a, #15803d); }
+  #map { height: 400px; border-radius: 10px; margin-bottom: 1.5rem; }
+  .mechanic-card { border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 1rem; transition: 0.3s; }
+  .mechanic-card:hover { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15); }
+</style>
+
+<div class="wrapper">
+  <div class="card">
+    <h1 class="title mb-4">🧰 Raise Service Request</h1>
+
+    <form method="POST" action="{% url 'raise_request' %}" id="serviceForm">
+      {% csrf_token %}
+
+      <!-- 🧰 Mechanic Type Selection -->
+      <div class="mb-4">
+        <label class="font-semibold block mb-2">
+          Select Mechanic Type <span class="text-red-500">*</span>
+        </label>
+        <select name="mechanic_type"
+                class="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                required>
+          <option value="">-- Choose Mechanic Type --</option>
+          <option value="two_wheeler" {% if mechanic_type == "two_wheeler" %}selected{% endif %}>Two-Wheeler Mechanic</option>
+          <option value="automotive" {% if mechanic_type == "automotive" %}selected{% endif %}>Automotive Mechanic</option>
+          <option value="heavy_vehicle" {% if mechanic_type == "heavy_vehicle" %}selected{% endif %}>Heavy Vehicle Mechanic</option>
+        </select>
+      </div>
+
+      <!-- 📝 Issue Details -->
+      <div class="mb-4">
+        <label class="font-semibold block mb-2">Describe Your Issue <span class="text-red-500">*</span></label>
+        <textarea name="issue" rows="4" required
+                  class="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-400">{{ issue|default_if_none:'' }}</textarea>
+      </div>
+
+      <!-- 🗺️ Map Section -->
+      <div class="mb-6">
+        <label class="font-semibold block mb-2">📍 Select Your Location on Map</label>
+        <div id="map"></div>
+        <small class="text-gray-500 block">
+          Click anywhere on the map or search your address below.  
+          The system will find nearby mechanics automatically.
+        </small>
+
+        <input type="hidden" id="latitude" name="latitude" value="{{ latitude|default:'' }}">
+        <input type="hidden" id="longitude" name="longitude" value="{{ longitude|default:'' }}">
+      </div>
+
+      {% if not mechanics %}
+        <button type="submit" class="btn mt-6">🔍 Find Nearby Mechanics</button>
+      {% endif %}
+
+      {% if mechanics %}
+        <hr class="my-6 border-gray-300" />
+        <h2 class="text-xl font-bold mb-3 text-gray-700">🧑‍🔧 Select a Mechanic</h2>
+
+        <div class="space-y-3">
+          {% for m in mechanics %}
+          <label class="mechanic-card block cursor-pointer">
+            <input type="radio" name="mechanic_id" value="{{ m.id }}" required class="mr-2">
+            <strong>{{ m.username }}</strong> — {{ m.mechanicprofile.shop_name|default:"Unnamed Shop" }}<br>
+            <small>📞 {{ m.mechanicprofile.phone|default:"N/A" }}</small><br>
+
+            {% if m.distance %}
+              <span class="text-green-600 font-semibold">📏 {{ m.distance }} km away</span><br>
+            {% endif %}
+
+            {% if m.avg_rating %}
+              <span>⭐ {{ m.avg_rating|floatformat:1 }}/5 ({{ m.review_count }} reviews)</span>
+            {% else %}
+              <span>⭐ No reviews yet</span>
+            {% endif %}
+          </label>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="btn mt-6">✅ Send Service Request</button>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<!-- 🌍 Leaflet Map Script -->
+<script>
+  const map = L.map("map").setView([9.9312, 76.2673], 12);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+  let userMarker;
+
+  map.on("click", function (e) {
+    const { lat, lng } = e.latlng;
+    if (userMarker) userMarker.setLatLng([lat, lng]);
+    else userMarker = L.marker([lat, lng], { draggable: true }).addTo(map);
+    document.getElementById("latitude").value = lat.toFixed(6);
+    document.getElementById("longitude").value = lng.toFixed(6);
+  });
+
+  // Auto-locate user
+  map.locate({ setView: true, maxZoom: 15 });
+  map.on("locationfound", function (e) {
+    if (!userMarker) {
+      userMarker = L.marker(e.latlng, { draggable: true }).addTo(map);
+      userMarker.bindPopup("📍 You are here").openPopup();
+      document.getElementById("latitude").value = e.latlng.lat.toFixed(6);
+      document.getElementById("longitude").value = e.latlng.lng.toFixed(6);
+    }
+  });
+
+  // Restore marker if coordinates already exist
+  const lat = "{{ latitude|default:'' }}";
+  const lng = "{{ longitude|default:'' }}";
+  if (lat && lng) {
+    userMarker = L.marker([lat, lng], { draggable: true }).addTo(map);
+    userMarker.bindPopup("📍 Your Selected Location").openPopup();
+    map.setView([lat, lng], 13);
+  }
+
+  // Geocoder search
+  L.Control.geocoder({ defaultMarkGeocode: false })
+    .on('markgeocode', function(e) {
+      const latlng = e.geocode.center;
+      map.setView(latlng, 15);
+      if (userMarker) userMarker.setLatLng(latlng);
+      else userMarker = L.marker(latlng, { draggable: true }).addTo(map);
+      document.getElementById('latitude').value = latlng.lat.toFixed(6);
+      document.getElementById('longitude').value = latlng.lng.toFixed(6);
+      userMarker.bindPopup(`📍 ${e.geocode.name}`).openPopup();
+    })
+    .addTo(map);
+</script>
+
+{% endblock %}

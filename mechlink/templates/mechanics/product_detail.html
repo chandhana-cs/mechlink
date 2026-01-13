@@ -1,0 +1,712 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  .product-details-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    animation: fadeIn 0.5s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .breadcrumb-nav {
+    background: none;
+    padding: 0;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+
+  .breadcrumb-nav a {
+    color: #667eea;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .breadcrumb-nav a:hover {
+    color: #764ba2;
+  }
+
+  .product-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Image Gallery Section */
+  .image-section {
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+  }
+
+  .main-image-container {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    margin-bottom: 1rem;
+    aspect-ratio: 1;
+  }
+
+  .main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+    cursor: zoom-in;
+  }
+
+  .main-image:hover {
+    transform: scale(1.05);
+  }
+
+  .image-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .badge-active {
+    background: rgba(34, 197, 94, 0.9);
+    color: white;
+  }
+
+  .badge-inactive {
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+  }
+
+  .thumbnail-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+
+  .thumbnail {
+    aspect-ratio: 1;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #f8fafc;
+  }
+
+  .thumbnail:hover {
+    border-color: #667eea;
+    transform: scale(1.05);
+  }
+
+  .thumbnail.active {
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+  }
+
+  .thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Details Section */
+  .details-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .product-header {
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #f1f5f9;
+  }
+
+  .product-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .product-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-badge {
+    padding: 0.375rem 0.875rem;
+    border-radius: 2rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    background: #f1f5f9;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  /* Price Section */
+  .price-section {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 1.75rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .price-label {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .price-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1e293b;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .currency {
+    font-size: 1.75rem;
+  }
+
+  .price-note {
+    font-size: 0.8125rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+  }
+
+  /* Stock Indicator */
+  .stock-section {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.25rem;
+    background: white;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+  }
+
+  .stock-indicator {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  .stock-label {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  .stock-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .stock-high {
+    color: #22c55e;
+  }
+
+  .stock-low {
+    color: #f59e0b;
+  }
+
+  .stock-out {
+    color: #ef4444;
+  }
+
+  .stock-bar {
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 1rem;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .stock-bar-fill {
+    height: 100%;
+    border-radius: 1rem;
+    transition: width 0.5s ease;
+  }
+
+  /* Description */
+  .description-section {
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
+  }
+
+  .section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .description-text {
+    color: #475569;
+    line-height: 1.7;
+    font-size: 0.9375rem;
+  }
+
+  /* Info Grid */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .info-card {
+    padding: 1.25rem;
+    background: white;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s;
+  }
+
+  .info-card:hover {
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .info-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .info-label {
+    font-size: 0.8125rem;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 0.375rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .info-value {
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 600;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 0.875rem 2rem;
+    border-radius: 0.75rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    color: white;
+  }
+
+  .btn-secondary {
+    background: white;
+    color: #64748b;
+    border: 2px solid #e2e8f0;
+  }
+
+  .btn-secondary:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #475569;
+  }
+
+  .btn-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Expandable Sections */
+  .expandable-section {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+
+  .expandable-header {
+    padding: 1.25rem;
+    background: #f8fafc;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+  }
+
+  .expandable-header:hover {
+    background: #f1f5f9;
+  }
+
+  .expandable-title {
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .expand-icon {
+    transition: transform 0.3s;
+  }
+
+  .expandable-section.expanded .expand-icon {
+    transform: rotate(180deg);
+  }
+
+  .expandable-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .expandable-section.expanded .expandable-content {
+    max-height: 500px;
+  }
+
+  .expandable-body {
+    padding: 1.25rem;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .product-layout {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .image-section {
+      position: relative;
+      top: 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .product-layout {
+      padding: 1.5rem;
+    }
+
+    .product-title {
+      font-size: 1.5rem;
+    }
+
+    .price-value {
+      font-size: 2rem;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="product-details-container">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb-nav">
+    <a href="{% url 'mechanic_dashboard' %}">Dashboard</a>
+    <span>›</span>
+    <a href="{% url 'mechanic_dashboard' %}">Products</a>
+    <span>›</span>
+    <span>{{ product.name }}</span>
+  </nav>
+
+  <!-- Product Layout -->
+  <div class="product-layout">
+    <!-- Image Section -->
+    <div class="image-section">
+      <div class="main-image-container" id="mainImageContainer">
+        {% if product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}" class="main-image" id="mainImage">
+        {% else %}
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #94a3b8; font-size: 3rem;">
+            📦
+          </div>
+        {% endif %}
+        
+        <div class="image-badge {% if product.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+          {% if product.is_active %}
+            <span>✓</span> Active
+          {% else %}
+            <span>✕</span> Inactive
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Thumbnail Grid (Example - add more if you have multiple images) -->
+      <div class="thumbnail-grid">
+        {% if product.image %}
+          <div class="thumbnail active">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+          </div>
+        {% endif %}
+        <!-- Placeholder thumbnails -->
+        <div class="thumbnail" style="opacity: 0.3;">
+          <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #cbd5e1;">
+            📷
+          </div>
+        </div>
+        <div class="thumbnail" style="opacity: 0.3;">
+          <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #cbd5e1;">
+            📷
+          </div>
+        </div>
+        <div class="thumbnail" style="opacity: 0.3;">
+          <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #cbd5e1;">
+            📷
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Details Section -->
+    <div class="details-section">
+      <!-- Product Header -->
+      <div class="product-header">
+        <h1 class="product-title">{{ product.name }}</h1>
+        <div class="product-meta">
+          <span class="meta-badge">
+            <span>🏷️</span> Product ID: #{{ product.id }}
+          </span>
+          <span class="meta-badge">
+            <span>📅</span> Listed {{ product.created_at|date:"M d, Y" }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Price Section -->
+      <div class="price-section">
+        <div class="price-label">Price</div>
+        <div class="price-value">
+          <span class="currency">₹</span>{{ product.price|floatformat:2 }}
+        </div>
+        <div class="price-note">Inclusive of all taxes</div>
+      </div>
+
+      <!-- Stock Section -->
+      <div class="stock-section">
+        <div class="stock-indicator">
+          <div class="stock-label">Stock Availability</div>
+          <div class="stock-value {% if product.stock > 20 %}stock-high{% elif product.stock > 0 %}stock-low{% else %}stock-out{% endif %}">
+            {% if product.stock > 20 %}
+              <span>✓</span> {{ product.stock }} Units
+            {% elif product.stock > 0 %}
+              <span>⚠️</span> {{ product.stock }} Units
+            {% else %}
+              <span>✕</span> Out of Stock
+            {% endif %}
+          </div>
+          <div class="stock-bar">
+            <div class="stock-bar-fill {% if product.stock > 20 %}stock-high{% elif product.stock > 0 %}stock-low{% else %}stock-out{% endif %}" 
+                 style="width: {% if product.stock > 100 %}100{% else %}{{ product.stock }}{% endif %}%; background: {% if product.stock > 20 %}#22c55e{% elif product.stock > 0 %}#f59e0b{% else %}#ef4444{% endif %};"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="description-section">
+        <div class="section-title">
+          <span>📄</span> Product Description
+        </div>
+        <p class="description-text">
+          {{ product.description|default:"No description available for this product." }}
+        </p>
+      </div>
+
+      <!-- Info Grid -->
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-icon">🕐</div>
+          <div class="info-label">Created On</div>
+          <div class="info-value">{{ product.created_at|date:"M d, Y" }}</div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">🔄</div>
+          <div class="info-label">Last Updated</div>
+          <div class="info-value">{{ product.updated_at|date:"M d, Y"|default:"N/A" }}</div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">📊</div>
+          <div class="info-label">Status</div>
+          <div class="info-value" style="color: {% if product.is_active %}#22c55e{% else %}#ef4444{% endif %};">
+            {% if product.is_active %}Active{% else %}Inactive{% endif %}
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">🏪</div>
+          <div class="info-label">Shop</div>
+          <div class="info-value">{{ product.mechanic.username|default:"N/A" }}</div>
+        </div>
+      </div>
+
+      <!-- Expandable Sections -->
+      <div class="expandable-section" id="specs">
+        <div class="expandable-header" onclick="toggleExpand('specs')">
+          <div class="expandable-title">
+            <span>⚙️</span> Specifications
+          </div>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="expandable-content">
+          <div class="expandable-body">
+            <div style="display: grid; gap: 0.75rem; color: #475569; font-size: 0.9375rem;">
+              <div style="display: flex; justify-content: space-between; padding-bottom: 0.75rem; border-bottom: 1px solid #f1f5f9;">
+                <span style="font-weight: 600;">Weight</span>
+                <span>N/A</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-bottom: 0.75rem; border-bottom: 1px solid #f1f5f9;">
+                <span style="font-weight: 600;">Dimensions</span>
+                <span>N/A</span>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="font-weight: 600;">Category</span>
+                <span>Auto Parts</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <a href="{% url 'mechanic_dashboard' %}" class="btn btn-secondary">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to Dashboard
+        </a>
+        <a href="#" class="btn btn-primary">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit Product
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Image zoom functionality
+  const mainImage = document.getElementById('mainImage');
+  const mainImageContainer = document.getElementById('mainImageContainer');
+
+  if (mainImage) {
+    mainImageContainer.addEventListener('click', function() {
+      mainImage.style.cursor = mainImage.style.cursor === 'zoom-out' ? 'zoom-in' : 'zoom-out';
+      mainImage.style.transform = mainImage.style.transform === 'scale(1.5)' ? 'scale(1)' : 'scale(1.5)';
+    });
+  }
+
+  // Expandable sections
+  function toggleExpand(sectionId) {
+    const section = document.getElementById(sectionId);
+    section.classList.toggle('expanded');
+  }
+
+  // Add animation to stock bar on load
+  window.addEventListener('load', function() {
+    const stockBar = document.querySelector('.stock-bar-fill');
+    if (stockBar) {
+      const targetWidth = stockBar.style.width;
+      stockBar.style.width = '0%';
+      setTimeout(() => {
+        stockBar.style.width = targetWidth;
+      }, 300);
+    }
+  });
+
+  // Thumbnail click functionality
+  document.querySelectorAll('.thumbnail').forEach(thumb => {
+    thumb.addEventListener('click', function() {
+      document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      
+      const img = this.querySelector('img');
+      if (img && mainImage) {
+        mainImage.src = img.src;
+      }
+    });
+  });
+</script>
+
+{% endblock %}

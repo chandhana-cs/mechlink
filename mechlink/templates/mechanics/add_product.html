@@ -1,0 +1,666 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --success: #10b981;
+        --bg-light: #f8fafc;
+        --card-bg: #ffffff;
+        --text-dark: #0f172a;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+        --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        --shadow-lg: 0 10px 30px rgba(0,0,0,0.15);
+        --shadow-xl: 0 20px 50px rgba(0,0,0,0.2);
+    }
+
+    body {
+        background: var(--bg-light);
+        font-family: 'Inter', sans-serif;
+        color: var(--text-dark);
+    }
+
+    .product-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    /* Hero Header */
+    .product-hero {
+        background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+        border-radius: 24px;
+        padding: 2.5rem 2rem;
+        margin-bottom: 3rem;
+        color: white;
+        box-shadow: var(--shadow-xl);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .product-hero::before {
+        content: '';
+        position: absolute;
+        top: -100px;
+        right: -100px;
+        width: 400px;
+        height: 400px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+
+    .product-hero::after {
+        content: '';
+        position: absolute;
+        bottom: -50px;
+        left: -50px;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 50%;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .form-section:last-of-type {
+        margin-bottom: 0;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .section-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    /* Form Groups */
+    .form-group {
+        margin-bottom: 1.75rem;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-label .required {
+        color: var(--primary);
+        margin-left: 0.25rem;
+    }
+
+    .form-label .optional {
+        color: var(--text-muted);
+        font-weight: 500;
+        font-size: 0.85rem;
+        margin-left: 0.5rem;
+    }
+
+    .form-input,
+    .form-textarea {
+        width: 100%;
+        padding: 0.875rem 1.125rem;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.2s ease;
+        background: white;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .form-hint {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    /* File Upload */
+    .file-upload-container {
+        position: relative;
+    }
+
+    .file-upload-wrapper {
+        border: 2px dashed var(--border-color);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: var(--bg-light);
+    }
+
+    .file-upload-wrapper:hover {
+        border-color: var(--primary);
+        background: rgba(99, 102, 241, 0.05);
+    }
+
+    .file-upload-wrapper.has-file {
+        border-color: var(--success);
+        background: rgba(16, 185, 129, 0.05);
+    }
+
+    .file-upload-input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .upload-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--text-muted);
+    }
+
+    .upload-text {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-hint {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .file-preview {
+        margin-top: 1rem;
+        display: none;
+    }
+
+    .file-preview.active {
+        display: block;
+    }
+
+    .preview-image {
+        width: 100%;
+        max-width: 300px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin: 0 auto;
+        display: block;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .file-name {
+        margin-top: 0.75rem;
+        padding: 0.75rem 1rem;
+        background: white;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .file-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+        font-weight: 500;
+    }
+
+    .remove-file {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 1.25rem;
+        padding: 0;
+        transition: color 0.2s ease;
+    }
+
+    .remove-file:hover {
+        color: #ef4444;
+    }
+
+    /* Grid Layout for Price and Stock */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    /* Buttons */
+    .btn-submit {
+        width: 100%;
+        padding: 1.25rem;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 1.15rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .btn-submit:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn-back {
+        width: 100%;
+        padding: 1rem;
+        background: transparent;
+        color: var(--text-dark);
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-back:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: rgba(99, 102, 241, 0.05);
+    }
+
+    /* Tips Card */
+    .tips-card {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .tips-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
+
+    .tips-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .tips-list li {
+        padding: 0.5rem 0;
+        color: var(--text-dark);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .tips-list li::before {
+        content: '✓';
+        color: var(--primary);
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .product-wrapper {
+            padding: 1.5rem 1rem;
+        }
+
+        .product-hero {
+            padding: 2rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .form-card {
+            padding: 1.5rem;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero-title {
+            font-size: 1.75rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-card {
+            padding: 1.25rem;
+        }
+
+        .file-upload-wrapper {
+            padding: 1.5rem;
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+        }
+    }
+</style>
+
+<div class="product-wrapper">
+    <!-- Hero Header -->
+    <div class="product-hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span>🛠️</span>
+                <span>Add New Product</span>
+            </h1>
+            <p class="hero-subtitle">List your product and reach more customers</p>
+        </div>
+    </div>
+
+    <!-- Tips Card -->
+    <div class="tips-card">
+        <div class="tips-header">
+            <span>💡</span>
+            <span>Quick Tips for Better Listings</span>
+        </div>
+        <ul class="tips-list">
+            <li>Use clear, descriptive product names</li>
+            <li>Add high-quality images for better visibility</li>
+            <li>Write detailed descriptions to help customers</li>
+            <li>Set competitive prices and accurate stock levels</li>
+        </ul>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+        <form method="POST" enctype="multipart/form-data" id="productForm">
+            {% csrf_token %}
+
+            <!-- Basic Information Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">📝</div>
+                    <h2 class="section-title">Basic Information</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="name" class="form-label">
+                        Product Name<span class="required">*</span>
+                    </label>
+                    <input type="text" 
+                           name="name" 
+                           id="name" 
+                           class="form-input" 
+                           placeholder="e.g., Premium Engine Oil 5W-30"
+                           required>
+                    <div class="form-hint">
+                        <span>ℹ️</span>
+                        <span>Enter a clear, descriptive name for your product</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description" class="form-label">
+                        Description<span class="optional">(optional)</span>
+                    </label>
+                    <textarea name="description" 
+                              id="description" 
+                              class="form-textarea" 
+                              placeholder="Describe your product features, specifications, and benefits..."></textarea>
+                    <div class="form-hint">
+                        <span>ℹ️</span>
+                        <span>Detailed descriptions help customers make informed decisions</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing & Inventory Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">💰</div>
+                    <h2 class="section-title">Pricing & Inventory</h2>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="price" class="form-label">
+                            Price<span class="required">*</span>
+                        </label>
+                        <input type="number" 
+                               step="0.01" 
+                               name="price" 
+                               id="price" 
+                               class="form-input" 
+                               placeholder="0.00"
+                               min="0"
+                               required>
+                        <div class="form-hint">
+                            <span>₹</span>
+                            <span>Enter price in rupees</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stock" class="form-label">
+                            Stock Quantity<span class="required">*</span>
+                        </label>
+                        <input type="number" 
+                               name="stock" 
+                               id="stock" 
+                               class="form-input" 
+                               placeholder="0"
+                               min="0"
+                               required>
+                        <div class="form-hint">
+                            <span>📦</span>
+                            <span>Available units</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Image Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">📸</div>
+                    <h2 class="section-title">Product Image</h2>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Upload Image<span class="optional">(optional)</span>
+                    </label>
+                    <div class="file-upload-container">
+                        <div class="file-upload-wrapper" id="uploadWrapper">
+                            <input type="file" 
+                                   name="image" 
+                                   id="image" 
+                                   class="file-upload-input"
+                                   accept="image/*">
+                            <div class="upload-icon">🖼️</div>
+                            <div class="upload-text">Click to upload or drag and drop</div>
+                            <div class="upload-hint">PNG, JPG or WEBP (Max. 5MB)</div>
+                        </div>
+                        <div class="file-preview" id="filePreview">
+                            <img id="previewImage" class="preview-image" alt="Preview">
+                            <div class="file-name">
+                                <div class="file-info">
+                                    <span>📎</span>
+                                    <span id="fileName"></span>
+                                </div>
+                                <button type="button" class="remove-file" id="removeFile">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <span>➕</span>
+                <span>Add Product</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Back Button -->
+    <a href="{% url 'mechanic_dashboard' %}" class="btn-back">
+        <span>←</span>
+        <span>Back to Dashboard</span>
+    </a>
+</div>
+
+<script>
+    // File upload preview functionality
+    const fileInput = document.getElementById('image');
+    const uploadWrapper = document.getElementById('uploadWrapper');
+    const filePreview = document.getElementById('filePreview');
+    const previewImage = document.getElementById('previewImage');
+    const fileName = document.getElementById('fileName');
+    const removeFile = document.getElementById('removeFile');
+
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                fileName.textContent = file.name;
+                filePreview.classList.add('active');
+                uploadWrapper.classList.add('has-file');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    removeFile.addEventListener('click', function() {
+        fileInput.value = '';
+        filePreview.classList.remove('active');
+        uploadWrapper.classList.remove('has-file');
+        previewImage.src = '';
+        fileName.textContent = '';
+    });
+
+    // Drag and drop functionality
+    uploadWrapper.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadWrapper.style.borderColor = 'var(--primary)';
+    });
+
+    uploadWrapper.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadWrapper.style.borderColor = 'var(--border-color)';
+    });
+
+    uploadWrapper.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadWrapper.style.borderColor = 'var(--border-color)';
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            fileInput.dispatchEvent(new Event('change'));
+        }
+    });
+</script>
+
+{% endblock %}

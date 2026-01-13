@@ -1,0 +1,62 @@
+{% if orders %}
+<div class="content-cards-grid">
+  {% for order in orders %}
+  <div class="content-card">
+    <div class="card-header">
+      <div class="card-title">{{ order.product.name }}</div>
+      <span class="status-badge status-{{ order.status|lower }}">{{ order.status }}</span>
+    </div>
+
+    <div class="card-details">
+      <div class="detail-row">
+        <div class="detail-icon">👤</div>
+        <span class="detail-label">Customer:</span>
+        <span class="detail-value">{{ order.customer.username }}</span>
+      </div>
+      <div class="detail-row">
+        <div class="detail-icon">💰</div>
+        <span class="detail-label">Total:</span>
+        <span class="detail-value" style="color: var(--primary); font-weight:700;">₹{{ order.total_price }}</span>
+      </div>
+      <div class="detail-row">
+        <div class="detail-icon">⏰</div>
+        <span class="detail-label">Date:</span>
+        <span class="detail-value">{{ order.ordered_at|date:"M d, Y H:i" }}</span>
+      </div>
+    </div>
+
+    <div class="card-actions">
+      <a href="{% url 'order_detail' order.id %}" class="action-btn btn-primary">
+        <i class="bi bi-eye-fill"></i> View
+      </a>
+
+      {% if order.status == 'Paid' %}
+      <a href="{% url 'update_order_status' order.id 'accept' %}" class="action-btn btn-success">
+        <i class="bi bi-check2-circle"></i> Accept
+      </a>
+      {% elif order.status == 'Accepted' %}
+      <a href="{% url 'update_order_status' order.id 'processing' %}" class="action-btn btn-primary">
+        <i class="bi bi-gear"></i> Processing
+      </a>
+      {% elif order.status == 'Processing' %}
+      <a href="{% url 'update_order_status' order.id 'deliver' %}" class="action-btn btn-success">
+        <i class="bi bi-truck"></i> Deliver
+      </a>
+      {% endif %}
+
+      {% if order.status != 'Delivered' and order.status != 'Cancelled' %}
+      <a href="{% url 'update_order_status' order.id 'cancel' %}" class="action-btn btn-danger">
+        <i class="bi bi-x-circle"></i> Cancel
+      </a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon">📦</div>
+  <div class="empty-title">No {{ tab_name }} Orders</div>
+  <div class="empty-text">Orders with this status will appear here</div>
+</div>
+{% endif %}

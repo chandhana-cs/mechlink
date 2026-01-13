@@ -1,0 +1,1632 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<style>
+  :root {
+    --primary: #ef4444;
+    --primary-dark: #dc2626;
+    --primary-light: #fca5a5;
+    --primary-soft: #fee2e2;
+
+    --sidebar-bg: #0f172a;
+    --sidebar-hover: #1e293b;
+    --sidebar-border: #334155;
+
+    --bg-main: #f8fafc;
+    --bg-glass: rgba(255, 255, 255, 0.85);
+
+    --white: #ffffff;
+    --gray-50: #f9fafb;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+
+    --success: #10b981;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --danger: #ef4444;
+
+    --radius-xl: 24px;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-glow: 0 0 40px rgba(239, 68, 68, 0.15);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: var(--gray-800);
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 50%, rgba(239, 68, 68, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app-shell {
+    min-height: 100vh;
+    display: flex;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 280px;
+    background: var(--sidebar-bg);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid var(--sidebar-border);
+    color: var(--gray-100);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 900;
+    box-shadow: var(--shadow-xl);
+  }
+
+  .sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .sidebar-header {
+    padding: 2rem 1.5rem;
+    border-bottom: 1px solid var(--sidebar-border);
+    position: relative;
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .brand-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    box-shadow: 0 8px 16px rgba(239, 68, 68, 0.3);
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 0%, var(--gray-300) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .brand-sub {
+    font-size: 0.75rem;
+    color: var(--gray-400);
+    font-weight: 500;
+  }
+
+  .sidebar-menu {
+    padding: 1.5rem 0;
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-700) transparent;
+  }
+
+  .sidebar-menu::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .sidebar-menu::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .sidebar-menu::-webkit-scrollbar-thumb {
+    background: var(--gray-700);
+    border-radius: 3px;
+  }
+
+  .menu-section-title {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gray-500);
+    padding: 0.75rem 1.5rem 0.5rem;
+    font-weight: 700;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.75rem 1.5rem;
+    margin: 0.25rem 0.75rem;
+    font-size: 0.9rem;
+    color: var(--gray-300);
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    font-weight: 500;
+  }
+
+  .menu-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background: var(--primary);
+    border-radius: 0 2px 2px 0;
+    transition: height 0.2s ease;
+  }
+
+  .menu-item:hover {
+    background: var(--sidebar-hover);
+    color: white;
+    transform: translateX(4px);
+  }
+
+  .menu-item.active {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+  }
+
+  .menu-item.active::before {
+    height: 60%;
+  }
+
+  .menu-icon {
+    width: 20px;
+    text-align: center;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .menu-text {
+    flex: 1;
+  }
+
+  .menu-badge {
+    font-size: 0.7rem;
+    border-radius: 999px;
+    padding: 0.15rem 0.5rem;
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--sidebar-border);
+  }
+
+  .profile-btn {
+    width: 100%;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--sidebar-border);
+    background: var(--sidebar-hover);
+    color: white;
+    padding: 0.875rem 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .profile-btn:hover {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(239, 68, 68, 0.3);
+  }
+
+  /* MAIN WRAPPER */
+  .main-wrapper {
+    flex: 1;
+    margin-left: 280px;
+    padding: 2rem;
+    min-height: 100vh;
+  }
+
+  .main-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* TOPBAR */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .topbar-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .topbar-title span:first-child {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--gray-500);
+    font-weight: 700;
+  }
+
+  .topbar-title span:last-child {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -0.02em;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .topbar-icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+    background: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-600);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .topbar-icon-btn:hover {
+    background: var(--gray-50);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    background: white;
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+  }
+
+  .topbar-user:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
+  }
+
+  .topbar-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+  }
+
+  .topbar-user-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar-user-info span:first-child {
+    font-size: 0.7rem;
+    color: var(--gray-500);
+    font-weight: 500;
+  }
+
+  .topbar-user-info span:last-child {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-900);
+  }
+
+  /* HERO + STATS */
+  .hero-row {
+    display: grid;
+    grid-template-columns: 1.8fr 1.2fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .hero-card {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    color: white;
+    box-shadow: var(--shadow-glow);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero-card h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+    position: relative;
+  }
+
+  .hero-card p {
+    font-size: 1rem;
+    opacity: 0.95;
+    line-height: 1.6;
+    position: relative;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    font-size: 0.85rem;
+    position: relative;
+  }
+
+  .hero-tag {
+    padding: 0.4rem 0.875rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .hero-tag:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .hero-cta-link {
+    margin-top: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    background: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .hero-cta-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+  }
+
+  .stat-card:hover {
+    box-shadow: var(--shadow-xl);
+    transform: translateY(-4px);
+    border-color: var(--primary-light);
+  }
+
+  .stat-card:hover::before {
+    transform: scaleY(1);
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-top: 0.25rem;
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--primary-soft) 0%, var(--gray-50) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover .stat-icon {
+    transform: scale(1.1) rotate(5deg);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    box-shadow: 0 8px 16px rgba(239, 68, 68, 0.3);
+  }
+
+  /* SECTION WRAPPER */
+  .section-block {
+    margin-top: 2.5rem;
+  }
+
+  .section-container {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  .section-container:hover {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--gray-100);
+  }
+
+  .section-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--primary-soft) 0%, var(--gray-50) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 1.15rem;
+  }
+
+  .section-title-text h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -0.02em;
+  }
+
+  .section-count {
+    font-size: 0.8rem;
+    border-radius: 999px;
+    padding: 0.4rem 0.875rem;
+    background: linear-gradient(135deg, var(--primary-soft) 0%, var(--gray-100) 100%);
+    color: var(--primary-dark);
+    font-weight: 700;
+  }
+
+  /* NOTIFICATIONS */
+  .notification-card {
+    border-radius: var(--radius-md);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .notification-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--primary);
+  }
+
+  .notification-card:hover {
+    background: white;
+    box-shadow: var(--shadow-md);
+    transform: translateX(4px);
+  }
+
+  .notification-message {
+    font-size: 0.95rem;
+    color: var(--gray-800);
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  .notification-time {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    margin-top: 0.5rem;
+    font-weight: 500;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: var(--gray-500);
+  }
+
+  .empty-title {
+    font-weight: 700;
+    color: var(--gray-700);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-text {
+    font-size: 0.95rem;
+  }
+
+  /* CARDS GRID */
+  .content-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .content-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .content-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .content-card:hover {
+    box-shadow: var(--shadow-xl);
+    transform: translateY(-4px);
+    border-color: var(--primary-light);
+  }
+
+  .content-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  .status-badge {
+    padding: 0.375rem 0.875rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .status-pending {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #92400e;
+  }
+  .status-accepted,
+  .status-in_progress {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1e40af;
+  }
+  .status-completed,
+  .status-delivered {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
+  }
+  .status-paid {
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    color: #075985;
+  }
+  .status-processing {
+    background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+    color: #9d174d;
+  }
+  .status-cancelled {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #991b1b;
+  }
+
+  .card-details {
+    margin-bottom: 1.25rem;
+  }
+
+  .detail-row {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .detail-row:last-child {
+    border-bottom: none;
+  }
+
+  .detail-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    background: var(--gray-50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-600);
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .detail-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--gray-600);
+    min-width: 80px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .detail-value {
+    font-size: 0.95rem;
+    color: var(--gray-800);
+    flex: 1;
+    font-weight: 500;
+  }
+
+  .card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .action-btn {
+    flex: 1;
+    min-width: 140px;
+    border-radius: var(--radius-md);
+    border: none;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #f87171 0%, var(--danger) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+
+  .btn-complete {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  /* PRICE & STARS */
+  .price-badge {
+    background: linear-gradient(135deg, var(--primary-soft) 0%, var(--gray-100) 100%);
+    color: var(--primary-dark);
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .star-rating {
+    display: flex;
+    gap: 0.15rem;
+  }
+
+  .star-rating span {
+    font-size: 1.1rem;
+    transition: transform 0.2s ease;
+  }
+
+  .star-rating span:hover {
+    transform: scale(1.2);
+  }
+
+  /* TABS (ORDERS) */
+  .nav-pills {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+  }
+
+  .nav-pills .nav-link {
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .nav-pills .nav-link:hover {
+    background: white;
+    color: var(--gray-900);
+  }
+
+  .nav-pills .nav-link.active {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+  }
+
+  .tab-content {
+    margin-top: 1.5rem;
+  }
+
+  .tab-pane {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .tab-pane.show.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* MOBILE */
+  .mobile-toggle {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    .main-wrapper {
+      margin-left: 0;
+      padding: 1rem;
+    }
+    .main-inner {
+      padding: 1.5rem;
+    }
+    .mobile-toggle {
+      display: flex;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      align-items: center;
+      justify-content: center;
+      z-index: 950;
+      box-shadow: var(--shadow-xl);
+      cursor: pointer;
+      font-size: 1.25rem;
+      transition: all 0.2s ease;
+    }
+    .mobile-toggle:hover {
+      transform: scale(1.05);
+    }
+    .hero-row {
+      grid-template-columns: 1fr;
+    }
+    .stats-row {
+      grid-template-columns: 1fr;
+    }
+    .content-cards-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .topbar {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .topbar-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  /* LOADING ANIMATIONS */
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .content-section {
+    animation: slideInUp 0.5s ease;
+  }
+
+  /* SCROLLBAR STYLING */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--gray-100);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--gray-400);
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-500);
+  }
+</style>
+
+<button class="mobile-toggle" id="mobileToggle">
+  <i class="bi bi-list"></i>
+</button>
+
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-row">
+        <div class="brand-icon">
+          <i class="bi bi-wrench-adjustable"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">MechLink</span>
+          <span class="brand-sub">Mechanic Dashboard</span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-menu">
+      <div class="menu-section-title">Overview</div>
+      <a class="menu-item active" data-section="dashboard">
+        <span class="menu-icon"><i class="bi bi-speedometer2"></i></span>
+        <span class="menu-text">Dashboard</span>
+      </a>
+
+      <div class="menu-section-title">Work</div>
+      <a class="menu-item" data-section="notifications">
+        <span class="menu-icon"><i class="bi bi-bell"></i></span>
+        <span class="menu-text">Notifications</span>
+        {% if notifications %}
+          <span class="menu-badge">{{ notifications|length }}</span>
+        {% endif %}
+      </a>
+      <a class="menu-item" data-section="service">
+        <span class="menu-icon"><i class="bi bi-tools"></i></span>
+        <span class="menu-text">Service Requests</span>
+        {% if service_requests %}
+          <span class="menu-badge">{{ service_requests|length }}</span>
+        {% endif %}
+      </a>
+      {% if active_chats %}
+      <a class="menu-item" data-section="chats">
+        <span class="menu-icon"><i class="bi bi-chat-dots"></i></span>
+        <span class="menu-text">Active Chats</span>
+        <span class="menu-badge">{{ active_chats|length }}</span>
+      </a>
+      {% endif %}
+
+      <div class="menu-section-title">Commerce</div>
+      <a class="menu-item" data-section="orders">
+        <span class="menu-icon"><i class="bi bi-box-seam"></i></span>
+        <span class="menu-text">Orders</span>
+        {% if all_orders %}
+          <span class="menu-badge">{{ all_orders|length }}</span>
+        {% endif %}
+      </a>
+      <a class="menu-item" data-section="products">
+        <span class="menu-icon"><i class="bi bi-shop"></i></span>
+        <span class="menu-text">Products</span>
+        {% if products %}
+          <span class="menu-badge">{{ products|length }}</span>
+        {% endif %}
+      </a>
+
+      <div class="menu-section-title">Feedback</div>
+      <a class="menu-item" data-section="feedback">
+        <span class="menu-icon"><i class="bi bi-star"></i></span>
+        <span class="menu-text">Customer Feedback</span>
+        {% if feedbacks %}
+          <span class="menu-badge">{{ feedbacks|length }}</span>
+        {% endif %}
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="{% url 'edit_mechanic_profile' %}" class="profile-btn">
+        <i class="bi bi-person-circle"></i>
+        <span>My Profile</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-wrapper">
+    <div class="main-inner">
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <div class="topbar-title">
+          <span>MECHLINK</span>
+          <span>Mechanic Control Panel</span>
+        </div>
+        <div class="topbar-right">
+          <button class="topbar-icon-btn">
+            <i class="bi bi-bell"></i>
+          </button>
+          <div class="topbar-user">
+            <div class="topbar-avatar">
+              <i class="bi bi-person"></i>
+            </div>
+            <div class="topbar-user-info">
+              <span>Signed in as</span>
+              <span>{{ user.username }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD SECTION -->
+      <section id="dashboard-section" class="content-section">
+        <div class="hero-row">
+          <div class="hero-card">
+            <h1>Welcome back, {{ user.username }} 👋</h1>
+            <p>Monitor service requests, chats, orders and inventory in one clean workspace.</p>
+            <div class="hero-meta">
+              <span class="hero-tag">Real-time workflow</span>
+              <span class="hero-tag">Customer centric</span>
+              <span class="hero-tag">On-site mechanic</span>
+            </div>
+            <a href="{% url 'edit_mechanic_profile' %}" class="hero-cta-link">
+              <i class="bi bi-person-lines-fill"></i> Update profile & availability
+            </a>
+          </div>
+
+          <div class="stats-row">
+            <div class="stat-card" data-scroll-target="notifications-section">
+              <div>
+                <div class="stat-label">Notifications</div>
+                <div class="stat-value">{{ notifications|length }}</div>
+              </div>
+              <div class="stat-icon"><i class="bi bi-bell"></i></div>
+            </div>
+            <div class="stat-card" data-scroll-target="service-section">
+              <div>
+                <div class="stat-label">Service Requests</div>
+                <div class="stat-value">{{ service_requests|length }}</div>
+              </div>
+              <div class="stat-icon"><i class="bi bi-tools"></i></div>
+            </div>
+            <div class="stat-card" data-scroll-target="orders-section">
+              <div>
+                <div class="stat-label">Total Orders</div>
+                <div class="stat-value">{{ all_orders|length }}</div>
+              </div>
+              <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+            </div>
+            <div class="stat-card" data-scroll-target="products-section">
+              <div>
+                <div class="stat-label">Products</div>
+                <div class="stat-value">{{ products|length }}</div>
+              </div>
+              <div class="stat-icon"><i class="bi bi-shop"></i></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- NOTIFICATIONS -->
+      <section id="notifications-section" class="section-block content-section">
+        <div class="section-container">
+          <div class="section-header">
+            <div class="section-title-wrap">
+              <div class="section-icon"><i class="bi bi-bell"></i></div>
+              <div class="section-title-text"><h2>Notifications</h2></div>
+            </div>
+            {% if notifications %}
+            <span class="section-count">{{ notifications|length }} new</span>
+            {% endif %}
+          </div>
+
+          {% if notifications %}
+            {% for n in notifications %}
+            <div class="notification-card">
+              <div class="notification-message">{{ n.message }}</div>
+              <div class="notification-time">{{ n.created_at|date:"M d, Y - h:i A" }}</div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty-state">
+              <div class="empty-title">No notifications</div>
+              <div class="empty-text">You're all caught up.</div>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- SERVICE REQUESTS -->
+      <section id="service-section" class="section-block content-section">
+        <div class="section-container">
+          <div class="section-header">
+            <div class="section-title-wrap">
+              <div class="section-icon"><i class="bi bi-tools"></i></div>
+              <div class="section-title-text"><h2>Service Requests</h2></div>
+            </div>
+            {% if service_requests %}
+            <span class="section-count">{{ service_requests|length }} active</span>
+            {% endif %}
+          </div>
+
+          {% if service_requests %}
+            <div class="content-cards-grid">
+              {% for req in service_requests %}
+              <div class="content-card">
+                <div class="card-header">
+                  <div class="card-title">{{ req.issue_description|truncatewords:10 }}</div>
+                  <span class="status-badge status-{{ req.status|lower }}">{{ req.status }}</span>
+                </div>
+                <div class="card-details">
+                  <div class="detail-row">
+                    <div class="detail-icon"><i class="bi bi-person"></i></div>
+                    <span class="detail-label">Customer</span>
+                    <span class="detail-value">{{ req.user.username }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-icon"><i class="bi bi-geo-alt"></i></div>
+                    <span class="detail-label">Location</span>
+                    <span class="detail-value">{{ req.location|truncatechars:25 }}</span>
+                  </div>
+                </div>
+                <div class="card-actions">
+                  {% if req.status == 'pending' %}
+                    <a href="{% url 'accept_request' req.id %}" class="action-btn btn-success">
+                      <i class="bi bi-check-lg"></i> Accept
+                    </a>
+                    <a href="{% url 'reject_request' req.id %}" class="action-btn btn-danger" onclick="return confirm('Reject this request?')">
+                      <i class="bi bi-x-lg"></i> Reject
+                    </a>
+                  {% elif req.status == 'accepted' or req.status == 'in_progress' %}
+                    <a href="{% url 'chat_view' req.id %}" class="action-btn btn-primary">
+                      <i class="bi bi-chat-dots-fill"></i> Chat
+                    </a>
+                    <a href="{% url 'complete_service' req.id %}" class="action-btn btn-complete" onclick="return confirm('Mark as completed?')">
+                      <i class="bi bi-check-circle-fill"></i> Complete
+                    </a>
+                  {% elif req.status == 'completed' %}
+                    <span class="action-btn" style="background: var(--gray-100); color: var(--gray-500); cursor: default;">
+                      <i class="bi bi-check-circle-fill"></i> Completed
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <div class="empty-title">No service requests</div>
+              <div class="empty-text">New requests will appear here.</div>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- ACTIVE CHATS -->
+      {% if active_chats %}
+      <section id="chats-section" class="section-block content-section">
+        <div class="section-container">
+          <div class="section-header">
+            <div class="section-title-wrap">
+              <div class="section-icon"><i class="bi bi-chat-dots"></i></div>
+              <div class="section-title-text"><h2>Active Chats</h2></div>
+            </div>
+            <span class="section-count">{{ active_chats|length }} active</span>
+          </div>
+
+          <div class="content-cards-grid">
+            {% for chat in active_chats %}
+            <div class="content-card">
+              <div class="card-header">
+                <div class="card-title">{{ chat.service_request.issue_description|truncatewords:10 }}</div>
+                <span class="status-badge status-{{ chat.service_request.status|lower }}">{{ chat.service_request.status }}</span>
+              </div>
+              <div class="card-details">
+                <div class="detail-row">
+                  <div class="detail-icon"><i class="bi bi-person"></i></div>
+                  <span class="detail-label">User</span>
+                  <span class="detail-value">{{ chat.service_request.user.username }}</span>
+                </div>
+                <div class="detail-row">
+                  <div class="detail-icon"><i class="bi bi-chat-text"></i></div>
+                  <span class="detail-label">Last</span>
+                  <span class="detail-value">{{ chat.last_message|default:"No messages"|truncatechars:30 }}</span>
+                </div>
+              </div>
+              <div class="card-actions">
+                <a href="{% url 'chat_view' chat.service_request.id %}" class="action-btn btn-primary">
+                  <i class="bi bi-chat-dots-fill"></i> Open Chat
+                </a>
+                {% if chat.service_request.status != 'completed' %}
+                <a href="{% url 'complete_service' chat.service_request.id %}" class="action-btn btn-complete" onclick="return confirm('Mark as completed?')">
+                  <i class="bi bi-check-circle-fill"></i> Complete
+                </a>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+      {% endif %}
+
+      <!-- ORDERS -->
+      <section id="orders-section" class="section-block content-section">
+        <div class="section-container">
+          <div class="section-header">
+            <div class="section-title-wrap">
+              <div class="section-icon"><i class="bi bi-box-seam"></i></div>
+              <div class="section-title-text"><h2>Orders Management</h2></div>
+            </div>
+            <span class="section-count">{{ all_orders|length }} total</span>
+          </div>
+
+          {% if all_orders %}
+            <ul class="nav nav-pills" id="order-tabs">
+              <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#all">All</a></li>
+              <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#paid">Paid</a></li>
+              <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#accepted">Accepted</a></li>
+              <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#processing">Processing</a></li>
+              <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#delivered">Delivered</a></li>
+              <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#cancelled">Cancelled</a></li>
+            </ul>
+
+            <div class="tab-content mt-3">
+              <div class="tab-pane fade show active" id="all">
+                {% include "mechanics/order_tab.html" with orders=all_orders tab_name="All" %}
+              </div>
+              <div class="tab-pane fade" id="paid">
+                {% include "mechanics/order_tab.html" with orders=paid_orders tab_name="Paid" %}
+              </div>
+              <div class="tab-pane fade" id="accepted">
+                {% include "mechanics/order_tab.html" with orders=accepted_orders tab_name="Accepted" %}
+              </div>
+              <div class="tab-pane fade" id="processing">
+                {% include "mechanics/order_tab.html" with orders=processing_orders tab_name="Processing" %}
+              </div>
+              <div class="tab-pane fade" id="delivered">
+                {% include "mechanics/order_tab.html" with orders=delivered_orders tab_name="Delivered" %}
+              </div>
+              <div class="tab-pane fade" id="cancelled">
+                {% include "mechanics/order_tab.html" with orders=cancelled_orders tab_name="Cancelled" %}
+              </div>
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <div class="empty-title">No orders yet</div>
+              <div class="empty-text">Orders will appear here when customers buy products.</div>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- PRODUCTS -->
+      <section id="products-section" class="section-block content-section">
+        <div class="section-container">
+          <div class="section-header">
+            <div class="section-title-wrap">
+              <div class="section-icon"><i class="bi bi-shop"></i></div>
+              <div class="section-title-text"><h2>My Products</h2></div>
+            </div>
+            <a href="{% url 'add_product' %}" class="action-btn btn-primary" style="flex:0 0 auto;min-width:auto;">
+              <i class="bi bi-plus-lg"></i> Add Product
+            </a>
+          </div>
+
+          {% if products %}
+            <div class="content-cards-grid">
+              {% for product in products %}
+              <div class="content-card">
+                <div class="card-header">
+                  <div class="card-title">{{ product.name|truncatewords:8 }}</div>
+                  <span class="price-badge">₹{{ product.price }}</span>
+                </div>
+                <div class="card-details">
+                  <div class="detail-row">
+                    <div class="detail-icon"><i class="bi bi-box"></i></div>
+                    <span class="detail-label">Stock</span>
+                    <span class="detail-value">{{ product.stock }} units</span>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-icon"><i class="bi bi-card-text"></i></div>
+                    <span class="detail-label">Description</span>
+                    <span class="detail-value">{{ product.description|truncatewords:8 }}</span>
+                  </div>
+                </div>
+                <div class="card-actions">
+                  <a href="{% url 'edit_product' product.id %}" class="action-btn btn-primary">
+                    <i class="bi bi-pencil-fill"></i> Edit
+                  </a>
+                  <a href="{% url 'delete_product' product.id %}" class="action-btn btn-danger" onclick="return confirm('Delete this product?')">
+                    <i class="bi bi-trash-fill"></i> Delete
+                  </a>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <div class="empty-title">No products listed</div>
+              <div class="empty-text">Start adding products to sell to customers.</div>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- FEEDBACK -->
+      <section id="feedback-section" class="section-block content-section">
+        <div class="section-container">
+          <div class="section-header">
+            <div class="section-title-wrap">
+              <div class="section-icon"><i class="bi bi-star"></i></div>
+              <div class="section-title-text"><h2>Customer Feedback</h2></div>
+            </div>
+            {% if feedbacks %}
+            <span class="section-count">{{ feedbacks|length }} reviews</span>
+            {% endif %}
+          </div>
+
+          {% if feedbacks %}
+            <div class="content-cards-grid">
+              {% for feedback in feedbacks %}
+              <div class="content-card">
+                <div class="card-header">
+                  <div class="card-title">{{ feedback.user.username }}</div>
+                  <div class="star-rating">
+                    {% for i in "12345" %}
+                      {% if forloop.counter <= feedback.rating %}
+                        <span style="color:#facc15;">★</span>
+                      {% else %}
+                        <span style="color:#d1d5db;">★</span>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="card-details">
+                  <div class="detail-row">
+                    <div class="detail-icon"><i class="bi bi-chat-square-quote"></i></div>
+                    <span class="detail-value">{{ feedback.comments|default:"No comments provided" }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-icon"><i class="bi bi-calendar3"></i></div>
+                    <span class="detail-label">Date</span>
+                    <span class="detail-value">{{ feedback.created_at|date:"M d, Y" }}</span>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <div class="empty-title">No feedback yet</div>
+              <div class="empty-text">Customer reviews will appear here.</div>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // Mobile sidebar toggle
+  const mobileToggle = document.getElementById('mobileToggle');
+  const sidebar = document.getElementById('sidebar');
+  if (mobileToggle) {
+    mobileToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
+  }
+
+  // Close sidebar on outside click for mobile
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+      if (!sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
+        sidebar.classList.remove('open');
+      }
+    }
+  });
+
+  // Sidebar section navigation (scroll)
+  const menuItems = document.querySelectorAll('.menu-item[data-section]');
+  const sections = document.querySelectorAll('.content-section');
+
+  function scrollToSection(name) {
+    const id = name === 'dashboard' ? 'dashboard-section' : name + '-section';
+    const target = document.getElementById(id);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  menuItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const sectionName = item.getAttribute('data-section');
+      menuItems.forEach(mi => mi.classList.remove('active'));
+      item.classList.add('active');
+      scrollToSection(sectionName);
+      sidebar.classList.remove('open');
+    });
+  });
+
+  // Stat cards scroll
+  document.querySelectorAll('.stat-card[data-scroll-target]').forEach(card => {
+    card.addEventListener('click', () => {
+      const targetId = card.getAttribute('data-scroll-target');
+      const target = document.getElementById(targetId);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Simple tab behavior if Bootstrap JS not loaded
+  document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+    tab.addEventListener('click', function(e) {
+      e.preventDefault();
+      const container = this.closest('.nav-pills');
+      container.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+
+      const selector = this.getAttribute('href');
+      const tabContent = container.parentElement.querySelector('.tab-content');
+      tabContent.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('show', 'active'));
+      const targetPane = document.querySelector(selector);
+      if (targetPane) targetPane.classList.add('show', 'active');
+    });
+  });
+
+  // Add intersection observer for scroll animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.content-section').forEach(section => {
+    section.style.opacity = '0';
+    section.style.transform = 'translateY(20px)';
+    section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(section);
+  });
+</script>
+
+{% endblock %}

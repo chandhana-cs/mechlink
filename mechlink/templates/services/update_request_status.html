@@ -1,0 +1,620 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --success: #10b981;
+    --success-dark: #059669;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --dark: #1e293b;
+    --text-dark: #0f172a;
+    --text-muted: #64748b;
+    --bg-light: #f8fafc;
+    --card-bg: #ffffff;
+    --border-color: #e2e8f0;
+  }
+
+  body {
+    background: var(--bg-light);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-dark);
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .update-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  /* Hero Header */
+  .update-header {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+    border-radius: 24px;
+    padding: 3rem 2.5rem;
+    margin-bottom: 2rem;
+    color: white;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  .update-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%);
+    animation: pulse 6s ease-in-out infinite;
+  }
+
+  .header-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .header-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+  }
+
+  .header-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff 0%, #e2e8f0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .request-badge {
+    display: inline-block;
+    background: rgba(99, 102, 241, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 800;
+    border: 2px solid rgba(99, 102, 241, 0.4);
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* Info Cards Grid */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    animation: fadeInUp 0.6s ease-out 0.1s backwards;
+  }
+
+  .info-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    border-color: var(--primary);
+  }
+
+  .info-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--success));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .info-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .info-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+  }
+
+  .info-value {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1.4;
+    word-wrap: break-word;
+  }
+
+  .info-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .icon-user {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(99, 102, 241, 0.05));
+  }
+
+  .icon-issue {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+  }
+
+  .icon-location {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));
+  }
+
+  /* Update Form Card */
+  .update-form-card {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 3rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border: 2px solid var(--border-color);
+    margin-bottom: 2rem;
+    animation: slideInRight 0.6s ease-out 0.2s backwards;
+  }
+
+  .form-section-title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--text-dark);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .form-group-enhanced {
+    margin-bottom: 2rem;
+  }
+
+  .form-label-enhanced {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-select {
+    width: 100%;
+    padding: 1.25rem 1.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    background: var(--bg-light);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.5rem;
+    padding-right: 3.5rem;
+  }
+
+  .status-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    background-color: white;
+  }
+
+  .status-select:hover {
+    border-color: var(--primary);
+  }
+
+  /* Status Preview */
+  .status-preview {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: var(--bg-light);
+    border-radius: 12px;
+    border-left: 4px solid var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .status-preview-icon {
+    font-size: 2rem;
+  }
+
+  .status-preview-text {
+    flex: 1;
+  }
+
+  .status-preview-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+  }
+
+  .status-preview-value {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-dark);
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .btn-enhanced {
+    flex: 1;
+    padding: 1.25rem 2rem;
+    border-radius: 16px;
+    font-weight: 900;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .btn-enhanced:hover::before {
+    left: 100%;
+  }
+
+  .btn-update {
+    background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+    color: white;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+  }
+
+  .btn-update:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.5);
+  }
+
+  .btn-cancel {
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+    color: white;
+    box-shadow: 0 8px 25px rgba(100, 116, 139, 0.4);
+  }
+
+  .btn-cancel:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(100, 116, 139, 0.5);
+  }
+
+  /* Chat Section */
+  .chat-section {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 2px solid rgba(99, 102, 241, 0.2);
+    text-align: center;
+    animation: fadeInUp 0.6s ease-out 0.3s backwards;
+  }
+
+  .chat-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .chat-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .chat-subtitle {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+  }
+
+  .btn-chat {
+    padding: 1.25rem 3rem;
+    border-radius: 16px;
+    font-weight: 900;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-chat::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .btn-chat:hover::before {
+    left: 100%;
+  }
+
+  .btn-chat:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 35px rgba(99, 102, 241, 0.5);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .update-container {
+      padding: 1rem 0.5rem;
+    }
+
+    .update-header {
+      padding: 2rem 1.5rem;
+    }
+
+    .header-title {
+      font-size: 2rem;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .update-form-card {
+      padding: 2rem 1.5rem;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .chat-section {
+      padding: 2rem 1.5rem;
+    }
+  }
+</style>
+
+<div class="update-container">
+  <!-- Hero Header -->
+  <div class="update-header">
+    <div class="header-content">
+      <div class="header-icon">📝</div>
+      <h1 class="header-title">Update Service Request</h1>
+      <div class="request-badge">
+        #{{ service_request.id }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Cards Grid -->
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-icon icon-user">👤</div>
+      <div class="info-label">
+        <span>Customer</span>
+      </div>
+      <div class="info-value">{{ service_request.user.username }}</div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon icon-issue">⚠️</div>
+      <div class="info-label">
+        <span>Issue Description</span>
+      </div>
+      <div class="info-value">{{ service_request.issue_description|truncatewords:15 }}</div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon icon-location">📍</div>
+      <div class="info-label">
+        <span>Service Location</span>
+      </div>
+      <div class="info-value">{{ service_request.location }}</div>
+    </div>
+  </div>
+
+  <!-- Update Form -->
+  <div class="update-form-card">
+    <h2 class="form-section-title">
+      <span>🔄</span> Update Status
+    </h2>
+
+    <form method="POST" id="updateForm">
+      {% csrf_token %}
+      <div class="form-group-enhanced">
+        <label for="status" class="form-label-enhanced">
+          <span>📊</span> Select New Status
+        </label>
+        <select name="status" id="status" class="status-select">
+          {% for value, label in service_request.STATUS_CHOICES %}
+            <option value="{{ value }}" {% if service_request.status == value %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+
+        <div class="status-preview" id="statusPreview">
+          <span class="status-preview-icon" id="statusIcon">⏳</span>
+          <div class="status-preview-text">
+            <div class="status-preview-label">Current Status</div>
+            <div class="status-preview-value" id="statusText">Pending</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button type="submit" class="btn-enhanced btn-update">
+          <span>✓</span> Update Request
+        </button>
+        <a href="{% url 'mechanic_service_requests' %}" class="btn-enhanced btn-cancel">
+          <span>✗</span> Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Chat Section -->
+  {% if service_request.status == 'accepted' %}
+  <div class="chat-section">
+    <div class="chat-icon">💬</div>
+    <h3 class="chat-title">Start a Conversation</h3>
+    <p class="chat-subtitle">Connect with {{ service_request.user.username }} to discuss the service details</p>
+    <a href="{% url 'chat_view' service_request.id %}" class="btn-chat">
+      <span>💬</span> Open Chat
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  // Status icon and text mapping
+  const statusConfig = {
+    'pending': { icon: '⏳', text: 'Pending', color: '#f59e0b' },
+    'accepted': { icon: '✓', text: 'Accepted', color: '#10b981' },
+    'in_progress': { icon: '⚙️', text: 'In Progress', color: '#3b82f6' },
+    'completed': { icon: '★', text: 'Completed', color: '#6366f1' },
+    'rejected': { icon: '✗', text: 'Rejected', color: '#ef4444' }
+  };
+
+  const statusSelect = document.getElementById('status');
+  const statusIcon = document.getElementById('statusIcon');
+  const statusText = document.getElementById('statusText');
+  const statusPreview = document.getElementById('statusPreview');
+
+  // Initialize with current status
+  updateStatusPreview(statusSelect.value);
+
+  // Update preview on change
+  statusSelect.addEventListener('change', function() {
+    updateStatusPreview(this.value);
+  });
+
+  function updateStatusPreview(status) {
+    const config = statusConfig[status] || statusConfig['pending'];
+    statusIcon.textContent = config.icon;
+    statusText.textContent = config.text;
+    statusPreview.style.borderLeftColor = config.color;
+  }
+
+  // Form submission animation
+  document.getElementById('updateForm').addEventListener('submit', function(e) {
+    const submitBtn = this.querySelector('.btn-update');
+    submitBtn.innerHTML = '<span>⏳</span> Updating...';
+    submitBtn.style.pointerEvents = 'none';
+  });
+
+  // Smooth animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.info-card, .update-form-card, .chat-section').forEach(el => {
+    observer.observe(el);
+  });
+</script>
+
+{% endblock %}
